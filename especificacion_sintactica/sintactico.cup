@@ -4,7 +4,7 @@ import java_cup.runtime.*;
 import ast.*;
 
 action code {:
-	private boolean modoDepuracion=false;
+	private boolean modoDepuracion=true;
 	private NodoBase ast=null;
 	private int lineanum=0;
 	
@@ -36,6 +36,9 @@ terminal OVER;
 terminal LPAREN;
 terminal RPAREN;
 terminal SEMI;
+terminal INT;
+terminal BOOLEAN;
+terminal COMMA;
 
 /* Simbolos No Terminales */
 non terminal program;
@@ -50,6 +53,9 @@ non terminal NodoBase exp;
 non terminal NodoBase simple_exp;
 non terminal NodoBase term;
 non terminal NodoBase factor;
+non terminal NodoBase var_list;
+non terminal NodoBase int_stmt;
+non terminal NodoBase boolean_stmt;
 
 /* Precedencia de operadores */
 precedence left PLUS;
@@ -63,7 +69,7 @@ program     ::= stmt_seq:s	{: if(modoDepuracion) System.out.println("\t regla 1"
 					:}
 		;
 
-stmt_seq    ::= stmt_seq:ini SEMI stmt:sent	{: if(modoDepuracion) System.out.println("\t regla 2a"); 
+stmt_seq    ::= stmt:sent SEMI stmt_seq:ini  {: if(modoDepuracion) System.out.println("\t regla 2a"); 
 						NodoBase hijoActual = ini;
 						if(hijoActual !=null){
 							while(hijoActual.TieneHermano()){
@@ -75,9 +81,7 @@ stmt_seq    ::= stmt_seq:ini SEMI stmt:sent	{: if(modoDepuracion) System.out.pri
 							RESULT=sent;
 						}
 						:}
-            | stmt:sent	{: if(modoDepuracion) System.out.println("\t regla 2b"); 
-				RESULT=sent;				
-				:}
+            |
 		;
 
 stmt        ::= if_stmt:sif	{: if(modoDepuracion) System.out.println("\t regla 3a"); 
@@ -95,7 +99,13 @@ stmt        ::= if_stmt:sif	{: if(modoDepuracion) System.out.println("\t regla 3
             | write_stmt:sesc	{: if(modoDepuracion) System.out.println("\t regla 3e"); 
 					RESULT=sesc;
 					:}
-            | error	{: if(modoDepuracion) System.out.println("\t regla 3f"); 
+			| int_stmt:sint 	{: if(modoDepuracion) System.out.println("\t regla 3f");
+					RESULT=sint; 
+					:}
+			| boolean_stmt:sboolean	{: if(modoDepuracion) System.out.println("\t regla 3g");
+					RESULT=sboolean; 
+					:}					
+            | error				{: if(modoDepuracion) System.out.println("\t regla 3h"); 
 				System.out.println("Ocurrio error en cup # 0004");
 				RESULT=null;
 				:}
@@ -203,3 +213,31 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 				RESULT=null;
 				:}
 		;
+		
+int_stmt	::= INT var_list  		{: if(modoDepuracion) System.out.println("\t regla 13");
+				:}	
+		;
+
+boolean_stmt::= BOOLEAN var_list 	{: if(modoDepuracion) System.out.println("\t regla 14");
+				:}
+		;
+
+var_list	::= ID:variable COMMA var_list 	{: if(modoDepuracion) System.out.println("\t regla 15a");
+					if(variable!=null){
+						System.out.println("Construyendo Nodo ID para Lexema: "+ variable.toString());
+						RESULT= new NodoIdentificador(variable.toString());		
+					}else{
+						RESULT = null;
+						System.out.println("Ocurrio error en cup # 0005");
+					}
+				:}
+		| ID:variable						{: if(modoDepuracion) System.out.println("\t regla 15c"); 
+					if(variable!=null){
+						System.out.println("Construyendo Nodo ID para Lexema: "+ variable.toString());
+						RESULT= new NodoIdentificador(variable.toString());		
+					}else{
+						RESULT = null;
+						System.out.println("Ocurrio error en cup # 0005");
+					}		
+				:}
+		;		

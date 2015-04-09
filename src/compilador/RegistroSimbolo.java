@@ -4,6 +4,7 @@ public class RegistroSimbolo {
 	private String identificador;
 	private int NumLinea;
 	private int DireccionMemoria;
+	private int tipo; 							// Para el tipo de dato del identificador 1=int 2=boolean
 	
 	public RegistroSimbolo(String identificador, int numLinea,
 			int direccionMemoria) {

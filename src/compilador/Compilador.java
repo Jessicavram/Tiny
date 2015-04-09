@@ -6,8 +6,8 @@ import java_cup.runtime.*;
 public class Compilador {
 	
 	/***********
-	SymbolFactory es una nueva caracteristica que ha sido añadida a las version 11a de cup, la cual facilita la implementacion de clases Symbol personalizadas
-	, esto debido a que dicha clase no provee mucha información de contexto que podria ser util para el analisis semantico o ayudar en la construccion del AST
+	SymbolFactory es una nueva caracteristica que ha sido aï¿½adida a las version 11a de cup, la cual facilita la implementacion de clases Symbol personalizadas
+	, esto debido a que dicha clase no provee mucha informaciï¿½n de contexto que podria ser util para el analisis semantico o ayudar en la construccion del AST
 	Mas informacion en: http//4thmouse.com/index.php/2007/02/15/using-custom-symbols-in-cup/
 	***********/
 
@@ -19,7 +19,6 @@ public class Compilador {
 			parser_obj=new parser(new Scanner(System.in,sf),sf);
 		else 
 			parser_obj=new parser(new Scanner(new java.io.FileInputStream(args[0]),sf),sf);
-
 		UtGen.debug=true; //NO muestro mensajes de depuracion del generador (UTGen) para que el codigo sea compatible con la version visual de la TM
 		//Para ver depuracion de analisis sintactico se debe ir al parser.java y colocar modoDepuracion en true
 		parser_obj.parse();

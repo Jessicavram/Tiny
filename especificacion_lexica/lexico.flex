@@ -64,6 +64,12 @@ espacio		= [ \t]+
 "write"         {	if(debug) System.out.println("token WRITE");
 			return sf.newSymbol("WRITE",sym.WRITE);
 			}
+"int"         {	if(debug) System.out.println("token INT");
+			return sf.newSymbol("INT",sym.INT);
+			}
+"boolean"         {	if(debug) System.out.println("token BOOLEAN");
+			return sf.newSymbol("BOOLEAN",sym.BOOLEAN);
+			}						
 ":="            {	if(debug) System.out.println("token ASSIGN");
 			return sf.newSymbol("ASSIGN",sym.ASSIGN);
 			}
@@ -91,6 +97,9 @@ espacio		= [ \t]+
 ")"             {	if(debug) System.out.println("token RPAREN");
 			return sf.newSymbol("RPAREN",sym.RPAREN);
 			}
+","             {	if(debug) System.out.println("token COMMA");
+			return sf.newSymbol("COMMA",sym.COMMA);
+			}			
 ";"             {	if(debug) System.out.println("token SEMI");
 			return sf.newSymbol("SEMI",sym.SEMI);
 			}
