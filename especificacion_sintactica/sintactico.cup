@@ -39,6 +39,7 @@ terminal SEMI;
 terminal INT;
 terminal BOOLEAN;
 terminal COMMA;
+terminal FOR;
 
 /* Simbolos No Terminales */
 non terminal program;
@@ -56,6 +57,7 @@ non terminal NodoBase factor;
 non terminal NodoBase var_list;
 non terminal NodoBase int_stmt;
 non terminal NodoBase boolean_stmt;
+non terminal NodoBase sent_for_stmt;
 
 /* Precedencia de operadores */
 precedence left PLUS;
@@ -104,7 +106,8 @@ stmt        ::= if_stmt:sif	{: if(modoDepuracion) System.out.println("\t regla 3
 					:}
 			| boolean_stmt:sboolean	{: if(modoDepuracion) System.out.println("\t regla 3g");
 					RESULT=sboolean; 
-					:}					
+					:}	
+			| sent_for_stmt:sfor {: RESULT = sfor; :}						
             | error				{: if(modoDepuracion) System.out.println("\t regla 3h"); 
 				System.out.println("Ocurrio error en cup # 0004");
 				RESULT=null;
@@ -208,6 +211,12 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 						System.out.println("Ocurrio error en cup # 0005");
 					}
 					:}
+		 |MINUS:opm NUM:valor{:
+		
+		:}
+		|MINUS:opm ID:variable{:
+		
+		:}	
 		| error	{: if(modoDepuracion) System.out.println("\t regla 12d"); 
 				System.out.println("Ocurrio error en cup # 0003");
 				RESULT=null;
@@ -235,9 +244,11 @@ var_list	::= ID:variable COMMA var_list 	{: if(modoDepuracion) System.out.printl
 					if(variable!=null){
 						System.out.println("Construyendo Nodo ID para Lexema: "+ variable.toString());
 						RESULT= new NodoIdentificador(variable.toString());		
-					}else{
+					}else{ 
 						RESULT = null;
 						System.out.println("Ocurrio error en cup # 0005");
 					}		
 				:}
 		;		
+ sent_for_stmt ::= FOR LPAREN assign_stmt:asig SEMI exp:ex SEMI assign_stmt:paso RPAREN stmt_seq:cuerpo END {: RESULT = new NodoFor(cuerpo,ex,asig,paso);
+				:};
