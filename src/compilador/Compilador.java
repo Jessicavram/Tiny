@@ -31,8 +31,8 @@ public class Compilador {
 		ts.cargarTabla(root);
 		ts.ImprimirClaves();
 	    //REALIZAR ACA ANALISIS SEMANTICO
-		Generador.setTablaSimbolos(ts);
-		Generador.generarCodigoObjeto(root);
+//		Generador.setTablaSimbolos(ts);
+//		Generador.generarCodigoObjeto(root);
 	}
 
 }
