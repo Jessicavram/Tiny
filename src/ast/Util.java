@@ -23,10 +23,14 @@ public class Util {
 		    else if (raiz instanceof  NodoEscribir)
 		    	System.out.println("Escribir");
 		    
+		    else if (raiz instanceof  NodoDeclaracion)
+		    	System.out.println("Declaracion");		    
+		    
 		    else if (raiz instanceof NodoOperacion
 		    		|| raiz instanceof NodoValor
-		    		|| raiz instanceof NodoIdentificador )
+		    		|| raiz instanceof NodoIdentificador)
 		    	imprimirNodo(raiz);
+		    	
 		    else System.out.println("Tipo de nodo desconocido");;
 		    
 		    /* Hago el recorrido recursivo */
@@ -63,6 +67,17 @@ public class Util {
 		    	System.out.println("**Expr Derecha Operacion**");		    	
 		    	imprimirAST(((NodoOperacion)raiz).getOpDerecho());
 		    }
+		    else if (raiz instanceof  NodoDeclaracion){
+	    		printSpaces();
+	    		System.out.println("**Tipo **");
+	    		printSpaces();
+	    		System.out.println(((NodoDeclaracion)raiz).getTipo() );	    		
+	    		imprimirAST(((NodoDeclaracion)raiz).getVariable());
+		    }
+		    else if(raiz instanceof NodoIdentificador){
+		    	if(((NodoIdentificador)raiz).getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
+		    		imprimirAST(((NodoIdentificador)raiz).getSiguiente());
+		    }		    
 		    raiz = raiz.getHermanoDerecha();
 		  }
 		  sangria-=2;

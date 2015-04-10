@@ -223,28 +223,26 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 				:}
 		;
 		
-int_stmt	::= INT var_list  		{: if(modoDepuracion) System.out.println("\t regla 13");
+int_stmt	::= INT var_list:variables_list  		{: if(modoDepuracion) System.out.println("\t regla 13");
+					RESULT = new NodoDeclaracion("Int",variables_list); 
 				:}	
 		;
 
-boolean_stmt::= BOOLEAN var_list 	{: if(modoDepuracion) System.out.println("\t regla 14");
+boolean_stmt::= BOOLEAN var_list:variables_list 	{: if(modoDepuracion) System.out.println("\t regla 14");
+					RESULT = new NodoDeclaracion("Boolean",variables_list);
 				:}
 		;
 
-var_list	::= ID:variable COMMA var_list 	{: if(modoDepuracion) System.out.println("\t regla 15a");
-					if(variable!=null){
-						System.out.println("Construyendo Nodo ID para Lexema: "+ variable.toString());
-						RESULT= new NodoIdentificador(variable.toString());		
-					}else{
-						RESULT = null;
-						System.out.println("Ocurrio error en cup # 0005");
-					}
+var_list	::= ID:variable COMMA var_list:variables_list 	{: if(modoDepuracion) System.out.println("\t regla 15a");
+					System.out.println("Construyendo Nodo ID para Lexema: "+ variable.toString());
+					RESULT = new NodoIdentificador(variable.toString(), variables_list);		
 				:}
 		| ID:variable						{: if(modoDepuracion) System.out.println("\t regla 15c"); 
 					if(variable!=null){
 						System.out.println("Construyendo Nodo ID para Lexema: "+ variable.toString());
 						RESULT= new NodoIdentificador(variable.toString());		
 					}else{ 
+
 						RESULT = null;
 						System.out.println("Ocurrio error en cup # 0005");
 					}		
