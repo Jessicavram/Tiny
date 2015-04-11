@@ -327,17 +327,6 @@ boolean_stmt::= BOOLEAN var_list:variables_list 	{: if(modoDepuracion) System.ou
 					RESULT = new NodoDeclaracion("Boolean",variables_list);
 				:}
 		;
-array	::= ID BRALEFT exp BRARIGHT  	{:
-				:}	
-		;
-		
-decl_array	::= ID:variable BRALEFT NUM:valor BRARIGHT  	{: RESULT = new NodoIdentificador(variable.toString(),new NodoValor(valor));
-																	:}	
-		;		
-
-decl_part ::=	 ID:variable {: RESULT = new NodoIdentificador(variable.toString()); :} 
-				
-				| decl_array:vector {: RESULT = vector; :} ;
 
 
 var_list	::= decl_part:dpart COMMA var_list 	{: if(modoDepuracion) System.out.println("\t regla 15a");
