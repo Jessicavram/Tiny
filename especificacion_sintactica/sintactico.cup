@@ -40,6 +40,11 @@ terminal INT;
 terminal BOOLEAN;
 terminal COMMA;
 terminal FOR;
+terminal BEGIN;
+terminal RETURN;
+terminal VOID;
+terminal boolean FALSE;
+terminal boolean TRUE;
 
 /* Simbolos No Terminales */
 non terminal program;
@@ -58,6 +63,16 @@ non terminal NodoBase var_list;
 non terminal NodoBase int_stmt;
 non terminal NodoBase boolean_stmt;
 non terminal NodoBase sent_for_stmt;
+non terminal NodoBase fuctions_stmt;
+non terminal NodoBase type_f_stmt;
+non terminal NodoBase type_r_stmt;
+non terminal NodoBase type_nr_stmt;
+non terminal NodoBase type_d_stmt;
+non terminal NodoBase args_stmt;
+non terminal NodoBase dec_stmt;
+non terminal NodoBase args_II_stmt;
+non terminal NodoBase strut_stmt;
+
 
 /* Precedencia de operadores */
 precedence left PLUS;
@@ -66,10 +81,71 @@ precedence left TIMES;
 
 
 /* REGLAS GRAMATICALES */
-program     ::= stmt_seq:s	{: if(modoDepuracion) System.out.println("\t regla 1"); 
-					ast = s;
+program ::= strut_stmt:s {: 
+				ast = s;
+			:}
+		;
+
+strut_stmt  ::= fuctions_stmt:ini BEGIN stmt_seq:set END	{: if(modoDepuracion) System.out.println("\t regla 0");
+									
+					NodoBase hijoActual = ini;
+						if(hijoActual !=null){
+							while(hijoActual.TieneHermano()){
+								hijoActual = hijoActual.getHermanoDerecha();
+							}
+							hijoActual.setHermanoDerecha(set);
+							RESULT=ini;
+						}else{
+							RESULT= new NodoFuncion(set);
+						}
+										
+					:}
+					
+		;		
+fuctions_stmt  ::= type_f_stmt fuctions_stmt {:  if(modoDepuracion) System.out.println("\t regla 20");
+					:}
+			| 	/* empty */
+		;
+		
+type_f_stmt ::= type_r_stmt  {: if(modoDepuracion) System.out.println("\t regla 21a");
+					:}
+			|	type_nr_stmt{:  if(modoDepuracion) System.out.println("\t regla 21b");
+					:}
+		; 
+type_r_stmt ::= type_d_stmt ID LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set RETURN exp END {: if(modoDepuracion) System.out.println("\t regla 22a");
+					RESULT= new NodoFuncion(arg,set);
+					:}
+			| 	type_d_stmt ID LPAREN  RPAREN BEGIN stmt_seq:set RETURN exp END {: if(modoDepuracion) System.out.println("\t regla 22b");
+					RESULT= new NodoFuncion(set);
+					:}
+		; 
+
+type_nr_stmt ::= VOID ID LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 23a");
+					RESULT= new NodoFuncion(arg,set);
+					:}
+			| 	VOID ID LPAREN  RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 23b");
+					RESULT= new NodoFuncion(set);
 					:}
 		;
+
+args_stmt ::= dec_stmt COMMA args_stmt {: if(modoDepuracion) System.out.println("\t regla 24a");
+					:}
+			|	dec_stmt{: if(modoDepuracion) System.out.println("\t regla 24b");
+					:}
+		;
+
+dec_stmt ::= type_d_stmt ID {: if(modoDepuracion) System.out.println("\t regla 25a");
+					:}
+			|	ID LPAREN args_II_stmt RPAREN{: if(modoDepuracion) System.out.println("\t regla 25b");
+					:}
+		; 
+
+args_II_stmt ::= exp COMMA args_II_stmt {: if(modoDepuracion) System.out.println("\t regla 26a");
+					:}
+			|	exp{: if(modoDepuracion) System.out.println("\t regla 26b");
+					:}
+		; 
+
 
 stmt_seq    ::= stmt:sent SEMI stmt_seq:ini  {: if(modoDepuracion) System.out.println("\t regla 2a"); 
 						NodoBase hijoActual = ini;
@@ -83,7 +159,7 @@ stmt_seq    ::= stmt:sent SEMI stmt_seq:ini  {: if(modoDepuracion) System.out.pr
 							RESULT=sent;
 						}
 						:}
-            |
+            | /* empty*/
 		;
 
 stmt        ::= if_stmt:sif	{: if(modoDepuracion) System.out.println("\t regla 3a"); 

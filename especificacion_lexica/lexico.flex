@@ -73,6 +73,9 @@ espacio		= [ \t]+
 			}
 "boolean"         {	if(debug) System.out.println("token BOOLEAN");
 			return sf.newSymbol("BOOLEAN",sym.BOOLEAN);
+			}
+"void"        {	if(debug) System.out.println("token VOID");
+			return sf.newSymbol("VOID",sym.VOID);
 			}						
 ":="            {	if(debug) System.out.println("token ASSIGN");
 			return sf.newSymbol("ASSIGN",sym.ASSIGN);
@@ -107,6 +110,14 @@ espacio		= [ \t]+
 ";"             {	if(debug) System.out.println("token SEMI");
 			return sf.newSymbol("SEMI",sym.SEMI);
 			}
+"begin"             {	if(debug) System.out.println("token BEGIN");
+			return sf.newSymbol("BEGIN",sym.BEGIN);
+			}
+			
+"return"             {	if(debug) System.out.println("token RETURN");
+			return sf.newSymbol("RETURN",sym.RETURN);
+			}
+
 {numero}        {	if(debug) System.out.println("token NUM");
 			return sf.newSymbol("NUM",sym.NUM,new Integer(yytext()));
 			}
