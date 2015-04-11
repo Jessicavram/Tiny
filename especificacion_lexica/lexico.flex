@@ -104,6 +104,12 @@ espacio		= [ \t]+
 ")"             {	if(debug) System.out.println("token RPAREN");
 			return sf.newSymbol("RPAREN",sym.RPAREN);
 			}
+"["           {	if(debug) System.out.println("token BRALEFT");
+			return sf.newSymbol("BRALEFT",sym.BRALEFT);
+			}
+"]"           {	if(debug) System.out.println("token BRARIGHT");
+			return sf.newSymbol("BRARIGHT",sym.BRARIGHT);
+			}							
 ","             {	if(debug) System.out.println("token COMMA");
 			return sf.newSymbol("COMMA",sym.COMMA);
 			}			

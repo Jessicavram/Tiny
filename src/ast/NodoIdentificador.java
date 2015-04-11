@@ -2,18 +2,20 @@ package ast;
 
 public class NodoIdentificador extends NodoBase {
 	private String nombre;
+	private NodoBase arg;
 	private NodoBase siguiente;
 	
-	public NodoIdentificador(String nombre, NodoBase siguiente) {
+	public NodoIdentificador(String nombre, NodoBase arg) {
 		super();
 		this.nombre = nombre;
-		this.siguiente = siguiente;
-	}
+		this.arg = arg;
+	}	
 	public NodoIdentificador(String nombre) {
 		super();
 		this.nombre = nombre;
 		this.siguiente = null;
 	}
+	
 	
 	public NodoIdentificador() {
 		super();

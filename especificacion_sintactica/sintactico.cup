@@ -45,6 +45,9 @@ terminal RETURN;
 terminal VOID;
 terminal boolean FALSE;
 terminal boolean TRUE;
+terminal BRALEFT;
+terminal BRARIGHT;
+
 
 /* Simbolos No Terminales */
 non terminal program;
@@ -72,6 +75,9 @@ non terminal NodoBase args_stmt;
 non terminal NodoBase dec_stmt;
 non terminal NodoBase args_II_stmt;
 non terminal NodoBase strut_stmt;
+non terminal NodoBase array;
+non terminal NodoBase decl_array;
+non terminal NodoBase decl_part;
 
 
 /* Precedencia de operadores */
@@ -215,6 +221,7 @@ assign_stmt ::= ID:variable 	{: if(modoDepuracion) System.out.println("\t regla 
 					System.out.println("Ocurrio error en cup # 0001");
 					}
 					:}
+			| array ASSIGN exp	{: RESULT=null; :}
 		;
 
 read_stmt   ::= READ ID:variable	{: if(modoDepuracion) System.out.println("\t regla 7"); 
@@ -287,6 +294,7 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 						System.out.println("Ocurrio error en cup # 0005");
 					}
 					:}
+		| array	
 		 |MINUS:opm NUM:valor{:
 		
 		:}
@@ -298,6 +306,17 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 				RESULT=null;
 				:}
 		;
+array	::= ID BRALEFT exp BRARIGHT  	{:
+				:}	
+		;
+		
+decl_array	::= ID:variable BRALEFT NUM:valor BRARIGHT  	{: RESULT = new NodoIdentificador(variable.toString(),new NodoValor(valor));
+																	:}	
+		;		
+
+decl_part ::=	 ID:variable {: RESULT = new NodoIdentificador(variable.toString()); :} 
+				
+				| decl_array:vector {: RESULT = vector; :} ;
 		
 int_stmt	::= INT var_list:variables_list  		{: if(modoDepuracion) System.out.println("\t regla 13");
 					RESULT = new NodoDeclaracion("Int",variables_list); 
@@ -308,20 +327,30 @@ boolean_stmt::= BOOLEAN var_list:variables_list 	{: if(modoDepuracion) System.ou
 					RESULT = new NodoDeclaracion("Boolean",variables_list);
 				:}
 		;
+array	::= ID BRALEFT exp BRARIGHT  	{:
+				:}	
+		;
+		
+decl_array	::= ID:variable BRALEFT NUM:valor BRARIGHT  	{: RESULT = new NodoIdentificador(variable.toString(),new NodoValor(valor));
+																	:}	
+		;		
 
-var_list	::= ID:variable COMMA var_list:variables_list 	{: if(modoDepuracion) System.out.println("\t regla 15a");
-					System.out.println("Construyendo Nodo ID para Lexema: "+ variable.toString());
-					RESULT = new NodoIdentificador(variable.toString(), variables_list);		
+decl_part ::=	 ID:variable {: RESULT = new NodoIdentificador(variable.toString()); :} 
+				
+				| decl_array:vector {: RESULT = vector; :} ;
+
+
+var_list	::= decl_part:dpart COMMA var_list 	{: if(modoDepuracion) System.out.println("\t regla 15a");
+					
+						System.out.println("Construyendo Nodo ID ");
+						RESULT= dpart;		
+					
 				:}
-		| ID:variable						{: if(modoDepuracion) System.out.println("\t regla 15c"); 
-					if(variable!=null){
-						System.out.println("Construyendo Nodo ID para Lexema: "+ variable.toString());
-						RESULT= new NodoIdentificador(variable.toString());		
-					}else{ 
-
-						RESULT = null;
-						System.out.println("Ocurrio error en cup # 0005");
-					}		
+		| decl_part:dpart						{: if(modoDepuracion) System.out.println("\t regla 15c"); 
+					
+						System.out.println("Construyendo Nodo ID");
+						RESULT= dpart;		
+						
 				:}
 		;		
  sent_for_stmt ::= FOR LPAREN assign_stmt:asig SEMI exp:ex SEMI assign_stmt:paso RPAREN stmt_seq:cuerpo END {: RESULT = new NodoFor(cuerpo,ex,asig,paso);
