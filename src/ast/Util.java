@@ -30,7 +30,9 @@ public class Util {
 		    		|| raiz instanceof NodoValor
 		    		|| raiz instanceof NodoIdentificador)
 		    	imprimirNodo(raiz);
-		    	
+		    else if (raiz instanceof NodoFuncion){
+		    	System.out.println("Bloque");	
+		    }
 		    else System.out.println("Tipo de nodo desconocido");;
 		    
 		    /* Hago el recorrido recursivo */
@@ -46,6 +48,18 @@ public class Util {
 		    		System.out.println("**Else IF**");
 		    		imprimirAST(((NodoIf)raiz).getParteElse());
 		    	}
+		    }
+		    else if (raiz instanceof NodoFuncion){
+		    	printSpaces();
+		    	if(((NodoFuncion)raiz).getArgs()!=null){
+		    		printSpaces();
+		    		System.out.println("**Argumentos**");
+		    		imprimirAST(((NodoFuncion)raiz).getArgs());
+		    	}
+		    	printSpaces();
+		    	System.out.println("**Bloque de sentencias**");
+		    	imprimirAST(((NodoFuncion)raiz).getSent());
+		    	
 		    }
 		    else if (raiz instanceof  NodoRepeat){
 		    	printSpaces();
