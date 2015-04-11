@@ -137,7 +137,12 @@ static void imprimirNodo( NodoBase raiz )
 	}
 
 	if(	raiz instanceof NodoIdentificador ){
-		System.out.println("ID, nombre= "+ ((NodoIdentificador)raiz).getNombre());
+		String variable;
+		variable = "ID, nombre= "+ ((NodoIdentificador)raiz).getNombre();
+		if (((NodoIdentificador)raiz).getTamano() != null)
+			variable += " -vector, tamano= " + ((NodoIdentificador)raiz).getTamano();
+		System.out.println(variable);
+		
 	}
 
 }
