@@ -297,7 +297,7 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 		| array	
 		 |MINUS:opm NUM:valor{:
 		
-		:}
+		:} 
 		|MINUS:opm ID:variable{:
 		
 		:}	
