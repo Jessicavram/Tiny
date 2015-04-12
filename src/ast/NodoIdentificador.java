@@ -26,6 +26,12 @@ public class NodoIdentificador extends NodoBase {
 		this.siguiente 	= null;
 	}
 	
+	public NodoIdentificador(NodoBase actual, NodoBase siguiente) {
+		super();
+		this.nombre 	= ((NodoIdentificador)actual).nombre;
+		this.tamano 	= null;
+		this.siguiente 	= siguiente;		
+	}	
 	public NodoIdentificador() {
 		super();
 	}

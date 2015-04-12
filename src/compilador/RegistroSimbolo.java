@@ -25,6 +25,10 @@ public class RegistroSimbolo {
 	public int getDireccionMemoria() {
 		return DireccionMemoria;
 	}
+	
+	public int getTipo(){
+		return tipo;
+	}
 
 	public void setDireccionMemoria(int direccionMemoria) {
 		DireccionMemoria = direccionMemoria;

@@ -321,7 +321,7 @@ boolean_stmt::= BOOLEAN var_list:variables_list 	{: if(modoDepuracion) System.ou
 
 var_list	::= decl_part:dpart COMMA var_list:variables 		{: if(modoDepuracion) System.out.println("\t regla 15a");
 				System.out.println("Construyendo Nodo ID ");
-				RESULT = new NodoIdentificador(dpart.toString(), variables);		
+				RESULT = new NodoIdentificador(dpart, variables);		
 			
 		:}
 		| decl_part:dpart							{: if(modoDepuracion) System.out.println("\t regla 15c"); 
