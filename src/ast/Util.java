@@ -54,6 +54,20 @@ public class Util {
 		    		imprimirAST(((NodoIf)raiz).getParteElse());
 		    	}
 		    }
+		    else if (raiz instanceof NodoFor){
+		    	printSpaces();
+		    	System.out.println("**Asignacion For**");
+		    	imprimirAST(((NodoFor)raiz).getAsignacion());
+		    	printSpaces();
+		    	System.out.println("**Prueba For**");
+		    	imprimirAST(((NodoFor)raiz).getPrueba());
+		    	printSpaces();
+		    	System.out.println("**Paso For**");
+		    	imprimirAST(((NodoFor)raiz).getPaso());
+		    	printSpaces();
+		    	System.out.println("**Bloque**");
+		    	imprimirAST(((NodoFor)raiz).getCuerpo());
+		    }
 		    else if (raiz instanceof NodoProgram){
 		    	printSpaces();
 		    	if(((NodoProgram)raiz).getFunctions()!=null){
