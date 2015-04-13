@@ -429,7 +429,7 @@ var_list	::= decl_part:dpart COMMA var_list:variables 		{: if(modoDepuracion) Sy
 				RESULT= dpart;		
 				
 		:}
-;	
+;	 
 
 decl_part ::=	 ID:variable {: 
 				RESULT = new NodoIdentificador(variable.toString()); 
