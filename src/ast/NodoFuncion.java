@@ -4,6 +4,7 @@ public class NodoFuncion extends NodoBase {
 	private NodoBase args;
 	private NodoBase sent;
 	private String nombre;
+	private NodoBase siguiente;
 	
 	public NodoFuncion (){
 		super();
@@ -16,21 +17,23 @@ public class NodoFuncion extends NodoBase {
 		super();
 		this.nombre=nombre;
 		this.args= args;
-		this.sent= sent;		
+		this.sent= sent;
+		this.siguiente=null;
 	}
-	
-	public NodoFuncion (String nombre,NodoBase algo, boolean x){
+	public NodoFuncion (String nombre, NodoBase args, NodoBase sent, NodoBase siguiente){
 		super();
 		this.nombre=nombre;
-		if (x){
-			this.args= null;
-			this.sent= algo;
-		}else{
-			this.args= algo;
-			this.sent= null;			
-		}
-		
-				
+		this.args= args;
+		this.sent= sent;
+		this.siguiente=siguiente;
+	}
+	
+	public NodoFuncion (String nombre,NodoBase sent){
+		super();
+		this.nombre=nombre;
+		this.args= null;
+		this.sent= sent;
+		this.siguiente=null;
 	}
 
 	public NodoFuncion (String nombre){
@@ -38,6 +41,7 @@ public class NodoFuncion extends NodoBase {
 		this.nombre=nombre;
 		this.args=null;
 		this.sent=null;
+		this.siguiente=null;
 	}
 	
 	public NodoBase getArgs(){
