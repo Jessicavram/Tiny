@@ -19,9 +19,10 @@ public class TablaSimbolos {
 
 	public void cargarTabla(NodoBase raiz){
 		while (raiz != null) {
+		
 	    if (raiz instanceof NodoIdentificador){
-	    	InsertarSimbolo(((NodoIdentificador)raiz).getNombre(),"main", "Int"); // cableado momentaneo
-	    	
+			
+	    	InsertarSimbolo(((NodoIdentificador)raiz).getNombre(),"main", ultimoTipo); // cableado momentaneo
 	    	if(((NodoIdentificador)raiz).getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
 	    		cargarTabla(((NodoIdentificador)raiz).getSiguiente());	    	
 	    	//TODO: A�adir el numero de linea y localidad de memoria correcta
@@ -48,13 +49,21 @@ public class TablaSimbolos {
 	    	cargarTabla(((NodoOperacion)raiz).getOpDerecho());
 	    }
 	    else if (raiz instanceof NodoDeclaracion) {
-//	    	ultimoTipo = ((NodoDeclaracion)raiz).getTipo();
-	    	cargarTabla(((NodoDeclaracion)raiz).getVariable());
+	    	ultimoTipo = ((NodoDeclaracion)raiz).getTipo();
+	    	NodoBase nodo=  ((NodoDeclaracion) raiz).getVariable();
+	    	
+	    	InsertarSimbolo(((NodoIdentificador)nodo).getNombre(),"main", ultimoTipo); // cableado momentaneo
+	    	
+	    	if(((NodoIdentificador)nodo).getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
+	    		cargarTabla(((NodoIdentificador)nodo).getSiguiente());
+	    	
 	    } 	    
 	    else if (raiz instanceof NodoFuncion) {
 	    	cargarTabla(((NodoFuncion)raiz).getSent());
 	    } 
-	    	
+	    else if (raiz instanceof NodoProgram) {
+	    	cargarTabla(((NodoProgram)raiz).getMain());
+	    } 	    	
 	    raiz = raiz.getHermanoDerecha();
 		
 	  }
@@ -63,6 +72,8 @@ public class TablaSimbolos {
 	//true es nuevo no existe se insertara, false ya existe NO se vuelve a insertar 
 	public boolean InsertarSimbolo(String identificador, String ambito, String tipo){
 		RegistroSimbolo simbolo;
+		
+
 		// Si existe el ambito busco su tabla con los simbolos
 		if(tabla.containsKey(ambito)){
 			tablaAmbito = tabla.get(ambito);
