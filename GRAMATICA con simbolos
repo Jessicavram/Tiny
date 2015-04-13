@@ -1,0 +1,97 @@
+program 		-> strut_stmt
+
+strut_stmt 		-> fuctions_stmt BEGIN stmt_seq END
+
+fuctions_stmt  	-> type_f_stmt fuctions_stmt 
+					| 	/* empty */
+
+type_f_stmt 	-> type_r_stmt
+					|	type_nr_stmt
+
+type_r_stmt 	-> type_d ID ( args_stmt ) BEGIN stmt_seq RETURN exp ; END 
+					| type_d ID ( ) BEGIN stmt_seq RETURN exp ; END 
+
+type_nr_stmt 	-> VOID ID:nom ( args_stmt ) BEGIN stmt_seq:set END 
+					|  VOID ID (  ) BEGIN stmt_seq:set END
+
+args_stmt 		-> dec_stmt , args_stmt 
+					|	dec_stmt
+
+dec_stmt 		-> type_d_stmt ID
+
+type_d_stmt 	-> INT 		
+					| BOOLEAN
+
+args_II_stmt 	-> exp , args_II_stmt 
+					|	exp
+
+stmt_seq    	-> stmt:sent ; stmt_seq:ini 
+					| /* empty*/
+
+stmt        	-> if_stmt
+					| repeat_stmt
+					| assign_stmt
+					| read_stmt
+					| write_stmt
+					| int_stmt
+					| boolean_stmt
+					| sent_for_stmt
+					| call_function
+					| error
+
+if_stmt     	-> IF exp:ex THEN stmt_seq:pthen END
+					| IF exp THEN stmt_seq ELSE tmt_seq END
+
+repeat_stmt 	-> REPEAT stmt_seq UNTIL exp
+
+assign_stmt 	-> ID = exp | array = exp
+
+read_stmt   	-> READ ID:variable
+
+write_stmt  	-> WRITE exp
+
+exp         	-> exp OR exp_and
+					|  exp_and
+
+exp_and     	-> exp_and AND exp_logica
+					| exp_logica
+
+exp_logica  	-> simple_exp < simple_exp
+					| simple_exp = simple_exp
+					| simple_exp != simple_exp
+					| simple_exp > simple_exp
+					| simple_exp >= simple_exp
+					| simple_exp <= simple_exp
+					| simple_exp
+
+simple_exp  	-> simple_exp + term
+					| simple_exp - term
+					| term
+
+term        	-> term * factor
+					| term / factor
+					| factor
+
+factor      	-> ( exp )
+					| NUM
+					| ID
+					| ID [ exp ]  
+					| - ( exp )
+					| - NUM
+					| - ID
+					| call_function
+					| error
+
+int_stmt		-> INT var_list
+
+boolean_stmt	-> BOOLEAN var_list
+
+var_list		-> decl_part , var_list
+					| decl_part
+
+decl_part   	-> ID
+					|  ID [ NUM ]
+
+sent_for_stmt 	-> FOR ( assign_stmt ; exp ; assign_stmt ) stmt_seq END 
+
+call_function	-> ID (args_II_stm) | ID ()
