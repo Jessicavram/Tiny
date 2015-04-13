@@ -80,6 +80,17 @@ espacio		= [ \t]+
 ":="            {	if(debug) System.out.println("token ASSIGN");
 			return sf.newSymbol("ASSIGN",sym.ASSIGN);
 			}
+"<="             {	if(debug) System.out.println("token LE");
+			return sf.newSymbol("LE",sym.LE);
+			}
+">="             {	if(debug) System.out.println("token GE");
+			return sf.newSymbol("GE",sym.GE);
+			}
+"!="             {	if(debug) System.out.println("token NE");
+			return sf.newSymbol("NE",sym.NE);
+			}
+">"             {	if(debug) System.out.println("token GT");
+			}			
 "="             {	if(debug) System.out.println("token EQ");
 			return sf.newSymbol("EQ",sym.EQ);
 			}
@@ -116,6 +127,12 @@ espacio		= [ \t]+
 ";"             {	if(debug) System.out.println("token SEMI");
 			return sf.newSymbol("SEMI",sym.SEMI);
 			}
+"and"             {	if(debug) System.out.println("token AND");
+			return sf.newSymbol("SEMI",sym.AND);
+			}
+"or"             {	if(debug) System.out.println("token OR");
+			return sf.newSymbol("SEMI",sym.OR);
+			}						
 "begin"             {	if(debug) System.out.println("token BEGIN");
 			return sf.newSymbol("BEGIN",sym.BEGIN);
 			}

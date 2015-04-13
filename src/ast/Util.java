@@ -25,14 +25,19 @@ public class Util {
 		    
 		    else if (raiz instanceof  NodoDeclaracion)
 		    	System.out.println("Declaracion");		    
+		    else if (raiz instanceof  NodoFor)
+		    	System.out.println("Bucle For");			    
 		    
 		    else if (raiz instanceof NodoOperacion
 		    		|| raiz instanceof NodoValor
 		    		|| raiz instanceof NodoIdentificador)
 		    	imprimirNodo(raiz);
 		    else if (raiz instanceof NodoFuncion){
-		    	System.out.println("Bloque");	
+		    	System.out.println(((NodoFuncion)raiz).getNombre());	
 		    }
+		    else if (raiz instanceof NodoProgram){
+		    	System.out.println("Estructura Principal");	
+		    }		    
 		    else System.out.println("Tipo de nodo desconocido");;
 		    
 		    /* Hago el recorrido recursivo */
@@ -49,18 +54,31 @@ public class Util {
 		    		imprimirAST(((NodoIf)raiz).getParteElse());
 		    	}
 		    }
+		    else if (raiz instanceof NodoProgram){
+		    	printSpaces();
+		    	if(((NodoProgram)raiz).getFunctions()!=null){
+		    		printSpaces();
+		    		System.out.print("Funcion: ");
+		    		imprimirAST(((NodoProgram)raiz).getFunctions());
+		    	}
+		    	printSpaces();
+		    	System.out.println("MAIN");
+		    	imprimirAST(((NodoProgram)raiz).getMain());
+		    	
+		    	
+		    }
 		    else if (raiz instanceof NodoFuncion){
 		    	printSpaces();
 		    	if(((NodoFuncion)raiz).getArgs()!=null){
-		    		printSpaces();
-		    		System.out.println("**Argumentos**");
+		    		System.out.println("Argumentos");
 		    		imprimirAST(((NodoFuncion)raiz).getArgs());
 		    	}
-		    	printSpaces();
-		    	System.out.println("**Bloque de sentencias**");
-		    	imprimirAST(((NodoFuncion)raiz).getSent());
+		    	if(((NodoFuncion)raiz).getSent()!=null){
+		    		System.out.println("Sentencias");
+			    	imprimirAST(((NodoFuncion)raiz).getSent());
+		    	}
 		    	
-		    }
+		    }		    
 		    else if (raiz instanceof  NodoRepeat){
 		    	printSpaces();
 		    	System.out.println("**Cuerpo REPEAT**");

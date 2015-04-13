@@ -4,14 +4,15 @@ public class RegistroSimbolo {
 	private String identificador;
 	private int NumLinea;
 	private int DireccionMemoria;
-	private int tipo; 							// Para el tipo de dato del identificador 1=int 2=boolean
+	private String tipo; 							// Para el tipo de dato del identificador 1=int 2=boolean
 	
 	public RegistroSimbolo(String identificador, int numLinea,
-			int direccionMemoria) {
+			int direccionMemoria, String tipo) {
 		super();
 		this.identificador = identificador;
 		NumLinea = numLinea;
 		DireccionMemoria = direccionMemoria;
+		this.tipo = tipo;
 	}
 
 	public String getIdentificador() {
@@ -26,7 +27,7 @@ public class RegistroSimbolo {
 		return DireccionMemoria;
 	}
 	
-	public int getTipo(){
+	public String getTipo(){
 		return tipo;
 	}
 
