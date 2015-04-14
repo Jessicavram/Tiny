@@ -422,6 +422,10 @@ var_list	::= decl_part:dpart COMMA var_list:variables 		{: if(modoDepuracion) Sy
 				RESULT = new NodoIdentificador(dpart, variables);		
 			
 		:}
+		| decl_part:dpart							{: if(modoDepuracion) System.out.println("\t regla 15c"); 
+				RESULT= dpart;		
+				
+		:}
 	;	
 
 

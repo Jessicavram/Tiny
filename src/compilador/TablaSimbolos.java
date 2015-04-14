@@ -19,12 +19,6 @@ public class TablaSimbolos {
 
 	public void cargarTabla(NodoBase raiz){
 		while (raiz != null) {
-	    if (raiz instanceof NodoIdentificador){
-	    	InsertarSimbolo(((NodoIdentificador)raiz).getNombre(),ultimoAmbito, ultimoTipo); 
-	    	if(((NodoIdentificador)raiz).getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
-	    		cargarTabla(((NodoIdentificador)raiz).getSiguiente());	    	
-	    	//TODO: A�adir el numero de linea y localidad de memoria correcta
-	    }
 	    /* Hago el recorrido recursivo */
 	    if (raiz instanceof  NodoIf){
 	    	cargarTabla(((NodoIf)raiz).getPrueba());
@@ -47,30 +41,33 @@ public class TablaSimbolos {
 	    	cargarTabla(((NodoOperacion)raiz).getOpDerecho());
 	    }
 	    else if (raiz instanceof NodoDeclaracion) {
-	    	
 	    	// Inserto el primer identificador y busco guardo el tipo de la declaracion que estoy recorriendo
 	    	ultimoTipo = ((NodoDeclaracion)raiz).getTipo();  
 	    	NodoBase nodo=  ((NodoDeclaracion) raiz).getVariable(); 	
-	    	InsertarSimbolo(((NodoIdentificador)nodo).getNombre(),ultimoAmbito, ultimoTipo); // cableado momentaneo
-	    	
-	    	// Compruebo que el identificador tenga hermanos y si tiene recorro recursivo
-	    	if(((NodoIdentificador)nodo).getSiguiente() != null) 
-	    		cargarTabla(((NodoIdentificador)nodo).getSiguiente());
+	    	InsertarSimbolo(((NodoIdentificador)nodo).getNombre(),ultimoAmbito, ultimoTipo);
+	    	cargarIdentificadores((NodoIdentificador)nodo);
 	    	
 	    } 	    
 	    else if (raiz instanceof NodoFuncion) {
-	    	System.out.println("Hola");
-	    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();
-	    	
+	    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion    	
 	    	cargarTabla(((NodoFuncion)raiz).getSent());
 	    } 
 	    else if (raiz instanceof NodoProgram) {
+	    	if(((NodoProgram)raiz).getFunctions()!=null){
+	    		cargarTabla(((NodoProgram)raiz).getFunctions());
+	    	}	
 	    	ultimoAmbito = "main";
 	    	cargarTabla(((NodoProgram)raiz).getMain());
 	    } 	    	
 	    raiz = raiz.getHermanoDerecha();
 		
 	  }
+	}
+	
+	public void cargarIdentificadores(NodoIdentificador identificador){
+    	InsertarSimbolo(identificador.getNombre(),ultimoAmbito, ultimoTipo); 
+    	if(identificador.getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
+    		cargarIdentificadores((NodoIdentificador)identificador.getSiguiente());	  	
 	}
 	
 	//true es nuevo no existe se insertara, false ya existe NO se vuelve a insertar 
@@ -84,14 +81,14 @@ public class TablaSimbolos {
 			if(tablaAmbito.containsKey(identificador)){
 				return false; // si existe no lo creo
 			} else {
-				simbolo= new RegistroSimbolo(identificador, -1, direccion++, tipo);
+				simbolo= new RegistroSimbolo(identificador,-1, direccion++, tipo);
 				tablaAmbito.put(identificador, simbolo);
 				return true;
 			}	
 		} else {
 			// Si el ambito no existe creo la nueva tabla para ambito
 			tablaAmbito = new HashMap<String, RegistroSimbolo>();
-			simbolo= new RegistroSimbolo(identificador, -1, direccion++, tipo);
+			simbolo= new RegistroSimbolo(identificador,-1, direccion++, tipo);
 			tablaAmbito.put(identificador, simbolo);			
 			tabla.put(ambito, tablaAmbito);
 			return true;
