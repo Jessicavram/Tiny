@@ -33,11 +33,14 @@ public class Util {
 		    		|| raiz instanceof NodoIdentificador)
 		    	imprimirNodo(raiz);
 		    else if (raiz instanceof NodoFuncion){
-		    	System.out.println(((NodoFuncion)raiz).getNombre());	
+		    	System.out.println("Funcion: "+((NodoFuncion)raiz).getNombre());	
 		    }
 		    else if (raiz instanceof NodoProgram){
 		    	System.out.println("Estructura Principal");	
-		    }		    
+		    }
+		    else if (raiz instanceof NodoCallFuncion){
+		    	System.out.println("-> Llamado a funcion: "+((NodoCallFuncion)raiz).getNombre());	
+		    }
 		    else System.out.println("Tipo de nodo desconocido");;
 		    
 		    /* Hago el recorrido recursivo */
@@ -72,7 +75,7 @@ public class Util {
 		    	printSpaces();
 		    	if(((NodoProgram)raiz).getFunctions()!=null){
 		    		printSpaces();
-		    		System.out.print("Funcion: ");
+		    		System.out.println("Bloque de Funciones");
 		    		imprimirAST(((NodoProgram)raiz).getFunctions());
 		    	}
 		    	printSpaces();
@@ -92,7 +95,15 @@ public class Util {
 			    	imprimirAST(((NodoFuncion)raiz).getSent());
 		    	}
 		    	
-		    }		    
+		    }
+		    else if (raiz instanceof NodoCallFuncion){
+		    	printSpaces();
+		    	if(((NodoCallFuncion)raiz).getArgs()!=null){
+		    		System.out.println("Argumentos");
+		    		imprimirAST(((NodoCallFuncion)raiz).getArgs());
+		    	}
+		    	
+		    }
 		    else if (raiz instanceof  NodoRepeat){
 		    	printSpaces();
 		    	System.out.println("**Cuerpo REPEAT**");
