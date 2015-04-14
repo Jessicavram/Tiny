@@ -10,7 +10,7 @@ public class TablaSimbolos {
 	private HashMap<String, RegistroSimbolo> tablaAmbito;
 	private int direccion;  //Contador de las localidades de memoria asignadas a la tabla
 	private String ultimoTipo;
-	
+	private String ultimoAmbito;
 	public TablaSimbolos() {
 		super();
 		tabla = new HashMap<String, HashMap<String, RegistroSimbolo>>();
@@ -19,10 +19,8 @@ public class TablaSimbolos {
 
 	public void cargarTabla(NodoBase raiz){
 		while (raiz != null) {
-		
 	    if (raiz instanceof NodoIdentificador){
-			
-	    	InsertarSimbolo(((NodoIdentificador)raiz).getNombre(),"main", ultimoTipo); // cableado momentaneo
+	    	InsertarSimbolo(((NodoIdentificador)raiz).getNombre(),ultimoAmbito, ultimoTipo); 
 	    	if(((NodoIdentificador)raiz).getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
 	    		cargarTabla(((NodoIdentificador)raiz).getSiguiente());	    	
 	    	//TODO: A�adir el numero de linea y localidad de memoria correcta
@@ -51,9 +49,9 @@ public class TablaSimbolos {
 	    else if (raiz instanceof NodoDeclaracion) {
 	    	
 	    	// Inserto el primer identificador y busco guardo el tipo de la declaracion que estoy recorriendo
-	    	ultimoTipo = ((NodoDeclaracion)raiz).getTipo();  		
+	    	ultimoTipo = ((NodoDeclaracion)raiz).getTipo();  
 	    	NodoBase nodo=  ((NodoDeclaracion) raiz).getVariable(); 	
-	    	InsertarSimbolo(((NodoIdentificador)nodo).getNombre(),"main", ultimoTipo); // cableado momentaneo
+	    	InsertarSimbolo(((NodoIdentificador)nodo).getNombre(),ultimoAmbito, ultimoTipo); // cableado momentaneo
 	    	
 	    	// Compruebo que el identificador tenga hermanos y si tiene recorro recursivo
 	    	if(((NodoIdentificador)nodo).getSiguiente() != null) 
@@ -61,9 +59,13 @@ public class TablaSimbolos {
 	    	
 	    } 	    
 	    else if (raiz instanceof NodoFuncion) {
+	    	System.out.println("Hola");
+	    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();
+	    	
 	    	cargarTabla(((NodoFuncion)raiz).getSent());
 	    } 
 	    else if (raiz instanceof NodoProgram) {
+	    	ultimoAmbito = "main";
 	    	cargarTabla(((NodoProgram)raiz).getMain());
 	    } 	    	
 	    raiz = raiz.getHermanoDerecha();
@@ -103,7 +105,6 @@ public class TablaSimbolos {
 	
 	public void ImprimirClaves(){
 		System.out.println("*** Tabla de Simbolos ***");
-		System.out.println(tabla.size());
 		for( Iterator <String>it = tabla.keySet().iterator(); it.hasNext();) { 
             String ambito = (String)it.next();
             System.out.println("Ambito: " + ambito);            

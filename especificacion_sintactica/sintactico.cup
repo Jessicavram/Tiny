@@ -109,15 +109,15 @@ strut_stmt  ::= fuctions_stmt:fun BEGIN stmt_seq:main END	{: if(modoDepuracion) 
 					
 		;		
 fuctions_stmt  ::= type_f_stmt:funcion fuctions_stmt:funciones {:  if(modoDepuracion) System.out.println("\t regla 20");
-						NodoBase hijoActual = funciones;
+						NodoBase hijoActual = funcion;
 						if(hijoActual !=null){
 							while(hijoActual.TieneHermano()){
 								hijoActual = hijoActual.getHermanoDerecha();
 							}
-							hijoActual.setHermanoDerecha(funcion);
-							RESULT=funciones;
-						}else{
+							hijoActual.setHermanoDerecha(funciones);
 							RESULT=funcion;
+						}else{
+							RESULT=funciones;
 						}
 					:}
 
@@ -155,15 +155,15 @@ type_nr_stmt ::= VOID ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END 
 		;
 
 args_stmt ::= dec_stmt:argu COMMA args_stmt:lista {: if(modoDepuracion) System.out.println("\t regla 24a");
-					NodoBase hijoActual = lista;
+					NodoBase hijoActual = argu;
 						if(hijoActual !=null){
 							while(hijoActual.TieneHermano()){
 								hijoActual = hijoActual.getHermanoDerecha();
 							}
-							hijoActual.setHermanoDerecha(argu);
-							RESULT=lista;
-						}else{
+							hijoActual.setHermanoDerecha(lista);
 							RESULT=argu;
+						}else{
+							RESULT=lista;
 						}
 					:}
 			|	dec_stmt:d{: if(modoDepuracion) System.out.println("\t regla 24b");
@@ -182,15 +182,15 @@ dec_stmt ::= INT ID:iden {: if(modoDepuracion) System.out.println("\t regla 25a"
 		;  
 
 args_II_stmt ::= exp:ex COMMA args_II_stmt:argume {: if(modoDepuracion) System.out.println("\t regla 26a");
-					NodoBase hijoActual = argume;
+					NodoBase hijoActual = ex;
 						if(hijoActual !=null){
 							while(hijoActual.TieneHermano()){
 								hijoActual = hijoActual.getHermanoDerecha();
 							}
-							hijoActual.setHermanoDerecha(ex);
-							RESULT=argume;
-						}else{
+							hijoActual.setHermanoDerecha(argume);
 							RESULT=ex;
+						}else{
+							RESULT=argume;
 						}
 					:}
 			|	exp:ex{: if(modoDepuracion) System.out.println("\t regla 26b");
@@ -199,19 +199,20 @@ args_II_stmt ::= exp:ex COMMA args_II_stmt:argume {: if(modoDepuracion) System.o
 		; 
 
 
-stmt_seq    ::= stmt:sent SEMI stmt_seq:ini  {: if(modoDepuracion) System.out.println("\t regla 2a"); 
-						NodoBase hijoActual = ini;
+stmt_seq    ::= stmt:sent SEMI stmt_seq:ini   {: if(modoDepuracion) System.out.println("\t regla 2a"); 
+						NodoBase hijoActual = sent;
 						if(hijoActual !=null){
 							while(hijoActual.TieneHermano()){
 								hijoActual = hijoActual.getHermanoDerecha();
 							}
-							hijoActual.setHermanoDerecha(sent);
-							RESULT=ini;
-						}else{
+							hijoActual.setHermanoDerecha(ini);
 							RESULT=sent;
-						}
+						}else{
+							RESULT=ini;
+						}	
 						:}
-            | /* empty*/
+
+			| /* empty */
 		;
 
 stmt        ::= if_stmt:sif	{: if(modoDepuracion) System.out.println("\t regla 3a"); 

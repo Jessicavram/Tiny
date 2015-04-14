@@ -18,7 +18,7 @@ public class Semantico {
 	    	// Buscar en la tabla de simbolos
 	    	
 	    	RegistroSimbolo simbolo =(RegistroSimbolo) tablaSimbolos.getTipo("main", identificador);
-	    	print(simbolo.getTipo());
+	    	print("hola");
 	    	
 	    	
 	    }
