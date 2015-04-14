@@ -132,25 +132,25 @@ type_f_stmt ::= type_r_stmt:t  {: if(modoDepuracion) System.out.println("\t regl
 					:}
 		; 
 type_r_stmt ::= BOOLEAN ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set RETURN exp SEMI END {: if(modoDepuracion) System.out.println("\t regla 22a");
-					RESULT= new NodoFuncion(nom,arg,set);
+					RESULT= new NodoFuncion("Boolena",nom,arg,set);
 					:}
 			| 	BOOLEAN ID:nom LPAREN  RPAREN BEGIN stmt_seq:set RETURN exp SEMI END {: if(modoDepuracion) System.out.println("\t regla 22b");
-					RESULT= new NodoFuncion(nom,set);
+					RESULT= new NodoFuncion("Boolena",nom,set);
 					:}
 			|   INT ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set RETURN exp SEMI END {: if(modoDepuracion) System.out.println("\t regla 22a");
-					RESULT= new NodoFuncion(nom,arg,set);
+					RESULT= new NodoFuncion("Int",nom,arg,set);
 					:}
 			| 	INT ID:nom LPAREN  RPAREN BEGIN stmt_seq:set RETURN exp SEMI END {: if(modoDepuracion) System.out.println("\t regla 22b");
-					RESULT= new NodoFuncion(nom,set);
+					RESULT= new NodoFuncion("Int",nom,set);
 					:}
 			
 		; 
 
 type_nr_stmt ::= VOID ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 23a");
-					RESULT= new NodoFuncion(nom,arg,set);
+					RESULT= new NodoFuncion("Void",nom,arg,set);
 					:}
 			| 	VOID ID:nom LPAREN  RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 23b");
-					RESULT= new NodoFuncion(nom,set);
+					RESULT= new NodoFuncion("Void",nom,set);
 					:}
 		;
 
