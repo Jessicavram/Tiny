@@ -35,7 +35,6 @@ terminal GE;
 terminal NE;
 terminal AND;
 terminal OR;
-terminal LT;
 terminal PLUS;
 terminal MINUS;
 terminal TIMES;
