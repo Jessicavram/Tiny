@@ -1,5 +1,3 @@
-x:=1;
-write x;
-if x<10 then
-write hola;
-end;
+begin
+        f(x,t(2+1));
+end 
