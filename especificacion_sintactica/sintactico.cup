@@ -422,13 +422,8 @@ var_list	::= decl_part:dpart COMMA var_list:variables 		{: if(modoDepuracion) Sy
 				RESULT = new NodoIdentificador(dpart, variables);		
 			
 		:}
-		| decl_part:dpart							{: if(modoDepuracion) System.out.println("\t regla 15c"); 
-			
-				System.out.println("Construyendo Nodo ID");
-				RESULT= dpart;		
-				
-		:}
-;	
+	;	
+
 
 decl_part ::=	 ID:variable {: 
 				RESULT = new NodoIdentificador(variable.toString()); 
@@ -437,7 +432,8 @@ decl_part ::=	 ID:variable {:
 				RESULT = new NodoIdentificador(variable.toString(),valor.intValue() );
 		:}	
 		;	
-						
- sent_for_stmt ::= FOR LPAREN assign_stmt:asig SEMI exp:ex SEMI assign_stmt:paso RPAREN stmt_seq:cuerpo END {: RESULT = new NodoFor(cuerpo,ex,asig,paso);
+array::=ID BRALEFT exp BRARIGHT {: :};
+
+sent_for_stmt ::= FOR LPAREN assign_stmt:asig SEMI exp:ex SEMI assign_stmt:paso RPAREN stmt_seq:cuerpo END {: RESULT = new NodoFor(cuerpo,ex,asig,paso);
 				:};
 

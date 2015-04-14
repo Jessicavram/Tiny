@@ -11,21 +11,19 @@ type_f_stmt 	-> type_r_stmt
 type_r_stmt 	-> type_d ID ( args_stmt ) BEGIN stmt_seq RETURN exp ; END 
 					| type_d ID ( ) BEGIN stmt_seq RETURN exp ; END 
 
+type_d_stmt 	-> INT 		
+					| BOOLEAN
+
 type_nr_stmt 	-> VOID ID:nom ( args_stmt ) BEGIN stmt_seq:set END 
 					|  VOID ID (  ) BEGIN stmt_seq:set END
 
 args_stmt 		-> dec_stmt , args_stmt 
 					|	dec_stmt
 
-dec_stmt 		-> type_d_stmt ID
+dec_stmt 		-> INT ID | BOOLEAN ID
 
-type_d_stmt 	-> INT 		
-					| BOOLEAN
 
-args_II_stmt 	-> exp , args_II_stmt 
-					|	exp
-
-stmt_seq    	-> stmt:sent ; stmt_seq:ini 
+stmt_seq    	-> stmt ; stmt_seq
 					| /* empty*/
 
 stmt        	-> if_stmt
@@ -44,9 +42,9 @@ if_stmt     	-> IF exp:ex THEN stmt_seq:pthen END
 
 repeat_stmt 	-> REPEAT stmt_seq UNTIL exp
 
-assign_stmt 	-> ID = exp
+assign_stmt 	-> ID = exp | array = exp
 
-read_stmt   	-> READ ID:variable
+read_stmt   	-> READ ID	| READ array
 
 write_stmt  	-> WRITE exp
 
@@ -75,7 +73,7 @@ term        	-> term * factor
 factor      	-> ( exp )
 					| NUM
 					| ID
-					| ID [ exp ]  
+					| array  
 					| - ( exp )
 					| - NUM
 					| - ID
@@ -95,3 +93,6 @@ decl_part   	-> ID
 sent_for_stmt 	-> FOR ( assign_stmt ; exp ; assign_stmt ) stmt_seq END 
 
 call_function	-> ID (args_II_stm) | ID ()
+
+args_II_stmt 	-> exp , args_II_stmt	|	exp
+array 			-> ID [ exp ]
