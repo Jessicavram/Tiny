@@ -35,6 +35,7 @@ terminal GE;
 terminal NE;
 terminal AND;
 terminal OR;
+terminal LT;
 terminal PLUS;
 terminal MINUS;
 terminal TIMES;
@@ -95,7 +96,6 @@ precedence left TIMES;
 precedence left UMINUS;
 precedence left OR;
 precedence left AND;
-
 /* REGLAS GRAMATICALES */
 program ::= strut_stmt:s {: 
 				ast = s;
@@ -264,13 +264,13 @@ exp         ::= exp:exI OR exp_and:exD {: if(modoDepuracion) System.out.println(
 								RESULT = ex;
 								:} 
 	    ;
-exp_and ::= exp_and:exI AND exp_logica:exD {: if(modoDepuracion) System.out.println("\t regla 9a"); 
-								RESULT = new NodoOperacion(exI,tipoOp.and,exD);
-								:} 
-		| exp_logica:ex {: if(modoDepuracion) System.out.println("\t regla 9a"); 
-								RESULT = ex;
-								:} 
-	    ;
+exp_and ::= exp_and:exI AND exp_logica:exD {: if(modoDepuracion) System.out.println("\t regla 9a");
+                                                               RESULT = new NodoOperacion(exI,tipoOp.and,exD);
+                                                               :}
+               | exp_logica:ex {: if(modoDepuracion) System.out.println("\t regla 9a");
+                                                               RESULT = ex;
+                                                               :}
+           ;
 exp_logica       ::= simple_exp:exI LT simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9a"); 
 								RESULT = new NodoOperacion(exI,tipoOp.menor,exD);
 								:} 
