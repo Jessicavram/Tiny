@@ -3,6 +3,7 @@ package ast;
 public class Util {
 	
 	static int sangria = 0;
+	static int contador=0;
 	
 	//Imprimo en modo texto con sangrias el AST
 	public static void imprimirAST(NodoBase raiz){
@@ -33,7 +34,7 @@ public class Util {
 		    		|| raiz instanceof NodoIdentificador)
 		    	imprimirNodo(raiz);
 		    else if (raiz instanceof NodoFuncion){
-		    	System.out.println("Funcion: "+((NodoFuncion)raiz).getNombre());	
+		    	System.out.println("Funcion: "+((NodoFuncion)raiz).getNombre()+ "   Tipo: "+((NodoFuncion)raiz).getTipo());	
 		    }
 		    else if (raiz instanceof NodoProgram){
 		    	System.out.println("Estructura Principal");	
@@ -56,6 +57,19 @@ public class Util {
 		    		System.out.println("**Else IF**");
 		    		imprimirAST(((NodoIf)raiz).getParteElse());
 		    	}
+		    }else if (raiz instanceof NodoFor){
+		    	printSpaces();
+		    	System.out.println("**Asignacion For**");
+		    	imprimirAST(((NodoFor)raiz).getAsignacion());
+		    	printSpaces();
+		    	System.out.println("**Prueba For**");
+		    	imprimirAST(((NodoFor)raiz).getPrueba());
+		    	printSpaces();
+		    	System.out.println("**Paso For**");
+		    	imprimirAST(((NodoFor)raiz).getPaso());
+		    	printSpaces();
+		    	System.out.println("**Bloque**");
+		    	imprimirAST(((NodoFor)raiz).getCuerpo());
 		    }
 		    else if (raiz instanceof NodoProgram){
 		    	printSpaces();
@@ -73,14 +87,18 @@ public class Util {
 		    else if (raiz instanceof NodoFuncion){
 		    	printSpaces();
 		    	if(((NodoFuncion)raiz).getArgs()!=null){
+		    		contador=0;
 		    		System.out.println("Argumentos");
 		    		imprimirAST(((NodoFuncion)raiz).getArgs());
-		    	}
+		    		((NodoFuncion)raiz).setNum(contador);
+		    		System.out.println("Cantidad de Argumentos de Funcion: "+((NodoFuncion)raiz).getNum());
+		    		
+		    	}else if(((NodoFuncion)raiz).getArgs()==null && ((NodoFuncion)raiz).getSent()!=null)
+		    		System.out.println("-> Sin Argumentos");
 		    	if(((NodoFuncion)raiz).getSent()!=null){
 		    		System.out.println("Sentencias");
 			    	imprimirAST(((NodoFuncion)raiz).getSent());
 		    	}
-		    	
 		    }
 		    else if (raiz instanceof NodoCallFuncion){
 		    	printSpaces();
@@ -167,6 +185,7 @@ static void imprimirNodo( NodoBase raiz )
 
 	if(	raiz instanceof NodoIdentificador ){
 		String variable;
+		contador+=1;
 		variable = "ID, nombre= "+ ((NodoIdentificador)raiz).getNombre();
 		if (((NodoIdentificador)raiz).getTamano() != null)
 			variable += " -vector, tamano= " + ((NodoIdentificador)raiz).getTamano();

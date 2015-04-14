@@ -49,12 +49,14 @@ public class TablaSimbolos {
 	    	cargarTabla(((NodoOperacion)raiz).getOpDerecho());
 	    }
 	    else if (raiz instanceof NodoDeclaracion) {
-	    	ultimoTipo = ((NodoDeclaracion)raiz).getTipo();
-	    	NodoBase nodo=  ((NodoDeclaracion) raiz).getVariable();
 	    	
+	    	// Inserto el primer identificador y busco guardo el tipo de la declaracion que estoy recorriendo
+	    	ultimoTipo = ((NodoDeclaracion)raiz).getTipo();  		
+	    	NodoBase nodo=  ((NodoDeclaracion) raiz).getVariable(); 	
 	    	InsertarSimbolo(((NodoIdentificador)nodo).getNombre(),"main", ultimoTipo); // cableado momentaneo
 	    	
-	    	if(((NodoIdentificador)nodo).getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
+	    	// Compruebo que el identificador tenga hermanos y si tiene recorro recursivo
+	    	if(((NodoIdentificador)nodo).getSiguiente() != null) 
 	    		cargarTabla(((NodoIdentificador)nodo).getSiguiente());
 	    	
 	    } 	    

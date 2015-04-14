@@ -95,7 +95,6 @@ precedence left TIMES;
 precedence left UMINUS;
 precedence left OR;
 precedence left AND;
-
 /* REGLAS GRAMATICALES */
 program ::= strut_stmt:s {: 
 				ast = s;
@@ -275,7 +274,7 @@ assign_stmt ::= ID:variable 	{: if(modoDepuracion) System.out.println("\t regla 
 					}
 					:}
 			| array ASSIGN exp	{: RESULT=null; :}
-		;
+				;
 
 read_stmt   ::= READ ID:variable	{: if(modoDepuracion) System.out.println("\t regla 7"); 
 					System.out.println("Leyendo Variable");
@@ -286,6 +285,10 @@ read_stmt   ::= READ ID:variable	{: if(modoDepuracion) System.out.println("\t re
 					System.out.println("Ocurrio error en cup # 0002");
 					}
 					:}
+			   |READ array {
+			      /* como hacer el nodo del arbol */
+			   
+			   }
 		;
 
 write_stmt  ::= WRITE exp:ex	{: if(modoDepuracion) System.out.println("\t regla 8"); 
@@ -300,13 +303,13 @@ exp         ::= exp:exI OR exp_and:exD {: if(modoDepuracion) System.out.println(
 								RESULT = ex;
 								:} 
 	    ;
-exp_and ::= exp_and:exI AND exp_logica:exD {: if(modoDepuracion) System.out.println("\t regla 9a"); 
-								RESULT = new NodoOperacion(exI,tipoOp.and,exD);
-								:} 
-		| exp_logica:ex {: if(modoDepuracion) System.out.println("\t regla 9a"); 
-								RESULT = ex;
-								:} 
-	    ;
+exp_and ::= exp_and:exI AND exp_logica:exD {: if(modoDepuracion) System.out.println("\t regla 9a");
+                                                               RESULT = new NodoOperacion(exI,tipoOp.and,exD);
+                                                               :}
+               | exp_logica:ex {: if(modoDepuracion) System.out.println("\t regla 9a");
+                                                               RESULT = ex;
+                                                               :}
+           ;
 exp_logica       ::= simple_exp:exI LT simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9a"); 
 								RESULT = new NodoOperacion(exI,tipoOp.menor,exD);
 								:} 
@@ -373,9 +376,7 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 						System.out.println("Ocurrio error en cup # 0005");
 					}
 					:}
-		| ID BRALEFT exp BRARIGHT  	{:
-						if(modoDepuracion) System.out.println("\t regla 12c"); 
-				:}	
+		| array	{: :}
 		|MINUS LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\t regla 12a"); 
 							RESULT = ex;
 							:} %prec UMINUS
@@ -424,7 +425,7 @@ var_list	::= decl_part:dpart COMMA var_list:variables 		{: if(modoDepuracion) Sy
 		:}
 		| decl_part:dpart							{: if(modoDepuracion) System.out.println("\t regla 15c"); 
 			
-				System.out.println("Construyendo Nodo ID");
+	
 				RESULT= dpart;		
 				
 		:}
@@ -437,7 +438,8 @@ decl_part ::=	 ID:variable {:
 				RESULT = new NodoIdentificador(variable.toString(),valor.intValue() );
 		:}	
 		;	
-						
- sent_for_stmt ::= FOR LPAREN assign_stmt:asig SEMI exp:ex SEMI assign_stmt:paso RPAREN stmt_seq:cuerpo END {: RESULT = new NodoFor(cuerpo,ex,asig,paso);
+array::=ID BRALEFT exp BRARIGHT {: :};
+
+sent_for_stmt ::= FOR LPAREN assign_stmt:asig SEMI exp:ex SEMI assign_stmt:paso RPAREN stmt_seq:cuerpo END {: RESULT = new NodoFor(cuerpo,ex,asig,paso);
 				:};
 
