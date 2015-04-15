@@ -123,6 +123,19 @@ public class TablaSimbolos {
 		RegistroSimbolo simbolo=(RegistroSimbolo)tablaAmbito.get(identificador);
 		return simbolo;
 	}
+	
+	public boolean buscarTabla(String ambito, String identificador){
+		if(tabla.containsKey(ambito)){
+			tablaAmbito = tabla.get(ambito);
+			if(tablaAmbito.containsKey(identificador)){
+				return true; // si existe no lo creo
+			} else {
+				return false;
+			}	
+		} else {
+			return false;
+		}		
+	}
 	/*
 	 * TODO:
 	 * 1. Crear lista con las lineas de codigo donde la variable es usada.

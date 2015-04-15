@@ -3,7 +3,9 @@ import ast.*;
 public class Semantico {
 	
 	private TablaSimbolos tablaSimbolos;
+	private String ultimoAmbito;
 
+	
 	public Semantico(TablaSimbolos tablaSimbolos) {
 		super();
 		this.tablaSimbolos = tablaSimbolos;
@@ -15,11 +17,10 @@ public class Semantico {
 	    if (raiz instanceof NodoIdentificador){
 	    	String identificador = ((NodoIdentificador)raiz).getNombre(); 
 	    	
-	    	// Buscar en la tabla de simbolos
-	    	
-	    	RegistroSimbolo simbolo =(RegistroSimbolo) tablaSimbolos.getTipo("main", identificador);
-	    	print("hola");
-	    	
+	    	// Compruebo que la variable ha sido declara en el ambito
+	    	if(!tablaSimbolos.buscarTabla(ultimoAmbito, identificador)){
+	    		System.err.println("Error Semantico: La variable " + identificador +" en la funcion "+ ultimoAmbito + " no ha sido declarado");
+	    	}	    		    	
 	    	
 	    }
 
@@ -51,8 +52,16 @@ public class Semantico {
 	    	cargarTabla(((NodoDeclaracion)raiz).getVariable());
 	    } 	    
 	    else if (raiz instanceof NodoFuncion) {
+	    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion    	    	
 	    	cargarTabla(((NodoFuncion)raiz).getSent());
 	    } 
+	    else if (raiz instanceof NodoProgram) {
+	    	if(((NodoProgram)raiz).getFunctions()!=null){
+	    		cargarTabla(((NodoProgram)raiz).getFunctions());
+	    	}	
+	    	ultimoAmbito = "main";
+	    	cargarTabla(((NodoProgram)raiz).getMain());
+	    }  
 	    	
 	    raiz = raiz.getHermanoDerecha();
 		

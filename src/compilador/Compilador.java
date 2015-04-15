@@ -31,8 +31,8 @@ public class Compilador {
 		tablaSimbolos.cargarTabla(root);
 		tablaSimbolos.ImprimirClaves();
 		
-//		Semantico semantico = new Semantico(tablaSimbolos);
-//		semantico.cargarTabla(root);
+		Semantico semantico = new Semantico(tablaSimbolos);
+		semantico.cargarTabla(root);
 	    //REALIZAR ACA ANALISIS SEMANTICO
 //		Generador.setTablaSimbolos(ts);
 //		Generador.generarCodigoObjeto(root);
