@@ -43,9 +43,7 @@ public class Util {
 		    	System.out.println("-> Llamado a funcion: "+((NodoCallFuncion)raiz).getNombre());	
 		    }
 
-		    else if (raiz instanceof NodoVector){
-		    	System.out.println("Nodo Vector: "+((NodoVector)raiz).getNombre()+"Tamaño"+((NodoVector)raiz).getTamano());	
-		    }
+		   
 		    else if (raiz instanceof NodoReturn){
 		    	System.out.print("-> Retornar: ");	
 		    }
@@ -76,16 +74,6 @@ public class Util {
 		    	printSpaces();
 		    	System.out.println("**Bloque**");
 		    	imprimirAST(((NodoFor)raiz).getCuerpo());
-		    }else if (raiz instanceof NodoVector){
-		    	printSpaces();
-		    	if(((NodoVector)raiz).getExpresion()!=null){
-		    	System.out.println("***Expresion***");
-		    	imprimirAST(((NodoVector)raiz).getExpresion());
-		    	}
-		    	if(((NodoVector)raiz).getSiguiente()!=null){
-		    	System.out.println("***Siguiente***");
-		    	imprimirAST(((NodoVector)raiz).getSiguiente());
-		    	}
 		    }		    
 		    else if (raiz instanceof NodoProgram){
 		    	printSpaces();
@@ -135,10 +123,17 @@ public class Util {
 		    	System.out.println("**Prueba REPEAT**");
 		    	imprimirAST(((NodoRepeat)raiz).getPrueba());
 		    }
-		    else if (raiz instanceof  NodoAsignacion)
+		    else if (raiz instanceof  NodoAsignacion){
+		    	if(((NodoAsignacion)raiz).getPosicion()!=null){
+		    		System.out.println("En la Posicion");
+		    		imprimirAST(((NodoAsignacion)raiz).getPosicion());
+		    	}
+		    	System.out.println("**El valor/epresion**");
 		    	imprimirAST(((NodoAsignacion)raiz).getExpresion());
+		    }
 		    else if (raiz instanceof  NodoEscribir)
 		    	imprimirAST(((NodoEscribir)raiz).getExpresion());
+		  
 		    else if (raiz instanceof NodoOperacion){
 		    	printSpaces();
 		    	System.out.println("**Expr Izquierda Operacion**");
@@ -199,6 +194,14 @@ static void imprimirNodo( NodoBase raiz )
 			System.out.println("*");
 		if(sel==tipoOp.entre)
 			System.out.println("/");
+		if(sel==tipoOp.mayorigual)
+			System.out.println(">=");
+		if(sel==tipoOp.menorigual)
+			System.out.println("<=");
+		if(sel==tipoOp.mayor)
+			System.out.println(">");
+		if(sel==tipoOp.noigual)
+			System.out.println("!=");
 	}
 
 	if(	raiz instanceof NodoValor ){

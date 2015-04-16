@@ -1,5 +1,8 @@
 begin
-int x,v[10];
+int x;
 
-v[2+x]:=1;
+if x>3 then
+x:=x+1;
+end;
+
 end

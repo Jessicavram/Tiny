@@ -90,7 +90,9 @@ espacio		= [ \t]+
 			return sf.newSymbol("NE",sym.NE);
 			}
 ">"             {	if(debug) System.out.println("token GT");
-			}			
+			return sf.newSymbol("GT",sym.GT);
+			}
+					
 "="             {	if(debug) System.out.println("token EQ");
 			return sf.newSymbol("EQ",sym.EQ);
 			}
