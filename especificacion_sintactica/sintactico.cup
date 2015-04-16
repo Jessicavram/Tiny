@@ -302,22 +302,22 @@ exp_and ::= exp_and:exI AND exp_logica:exD {: if(modoDepuracion) System.out.prin
 exp_logica       ::= simple_exp:exI LT simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9a"); 
 								RESULT = new NodoOperacion(exI,tipoOp.menor,exD);
 								:} 
+		| simple_exp:exI GT simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9d"); 
+							RESULT = new NodoOperacion(exI,tipoOp.mayor,exD);
+							:}
 		| simple_exp:exI EQ simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9b"); 
 							RESULT = new NodoOperacion(exI,tipoOp.igual,exD);
 							:}
-		| simple_exp:exI NE simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9b"); 
+		| simple_exp:exI NE simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9c"); 
 							RESULT = new NodoOperacion(exI,tipoOp.noigual,exD);
 							:}
-		| simple_exp:exI GT simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9b"); 
-							RESULT = new NodoOperacion(exI,tipoOp.mayor,exD);
-							:}
-		| simple_exp:exI GE simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9b"); 
+		| simple_exp:exI GE simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9e"); 
 							RESULT = new NodoOperacion(exI,tipoOp.mayorigual,exD);
 							:}	
-		| simple_exp:exI LE simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9b"); 
+		| simple_exp:exI LE simple_exp:exD	{: if(modoDepuracion) System.out.println("\t regla 9f"); 
 							RESULT = new NodoOperacion(exI,tipoOp.menorigual,exD);
 							:}						
-		| simple_exp:ex	{: if(modoDepuracion) System.out.println("\t regla 9c"); 
+		| simple_exp:ex	{: if(modoDepuracion) System.out.println("\t regla 9g"); 
 					RESULT = ex;
 					:}
 		;	    

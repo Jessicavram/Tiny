@@ -133,6 +133,7 @@ public class Util {
 		    }
 		    else if (raiz instanceof  NodoEscribir)
 		    	imprimirAST(((NodoEscribir)raiz).getExpresion());
+		  
 		    else if (raiz instanceof NodoOperacion){
 		    	printSpaces();
 		    	System.out.println("**Expr Izquierda Operacion**");
@@ -193,6 +194,14 @@ static void imprimirNodo( NodoBase raiz )
 			System.out.println("*");
 		if(sel==tipoOp.entre)
 			System.out.println("/");
+		if(sel==tipoOp.mayorigual)
+			System.out.println(">=");
+		if(sel==tipoOp.menorigual)
+			System.out.println("<=");
+		if(sel==tipoOp.mayor)
+			System.out.println(">");
+		if(sel==tipoOp.noigual)
+			System.out.println("!=");
 	}
 
 	if(	raiz instanceof NodoValor ){
