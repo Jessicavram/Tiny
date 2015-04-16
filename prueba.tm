@@ -1,8 +1,9 @@
 begin
-int x;
+int x,v[10];
 
-if x>3 then
-x:=x+1;
+if(x=4) then
+x:=3;
 end;
+
 
 end

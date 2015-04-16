@@ -27,7 +27,7 @@ public class Semantico {
 		    /* Hago el recorrido recursivo */
 		    if (raiz instanceof  NodoIf){
 		    	if (comprobarTipo(((NodoIf)raiz).getPrueba()) != "Boolean")
-		    		printError("Error: no se puede probar la expresion en el if");
+		    	printError("Error: no se puede probar la expresion en el if");
 		    	
 		    	recorrerArbol(((NodoIf)raiz).getParteThen());
 		    	if(((NodoIf)raiz).getParteElse()!=null){
@@ -102,6 +102,8 @@ public class Semantico {
 				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
 				if( tipoIzquierdo == "Boolean" && tipoDerecho == "Boolean" )
 					return "Boolean";	
+				else if(tipoIzquierdo=="Int" && tipoDerecho=="Int")
+					return "Boolean";
 				else 
 					return "Int";
 			} else if(((NodoOperacion)nodo).getOperacion() == tipoOp.mas 
@@ -140,7 +142,9 @@ public class Semantico {
 		}
 		else if(nodo instanceof NodoValor){	
 			// falta mejorar
-			((NodoValor)nodo).getValor() ;
+			//((NodoValor)nodo).getValor() ;
+			String tipoValor="Int";
+			return tipoValor;
 		}
 		
 		return "";
