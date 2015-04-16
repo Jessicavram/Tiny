@@ -45,8 +45,9 @@ public class Semantico {
 		    	String identificador = ((NodoAsignacion)raiz).getIdentificador();
 		    	
 		    	if (verificarExistenciaDeVariable(identificador)){	    	
-		    		String tipo = tablaSimbolos.getTipo(ultimoAmbito, identificador);		    				    		
-		    		if(comprobarTipo(((NodoAsignacion)raiz).getExpresion()) == tipo){
+		    		String tipo = tablaSimbolos.getTipo(ultimoAmbito, identificador);
+		    		print(tipo +" "+ comprobarTipo(((NodoAsignacion)raiz).getExpresion()));
+		    		if(comprobarTipo(((NodoAsignacion)raiz).getExpresion()) != tipo){
 		    			printError("Asignacion a variable de diferente tipo");
 		    		}
 		    	
@@ -109,7 +110,6 @@ public class Semantico {
 					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.entre){ 
 				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
 				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
-
 				if( tipoIzquierdo == "Int" && tipoDerecho == "Int")									
 					return "Int";
 				else
