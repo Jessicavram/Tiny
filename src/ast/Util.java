@@ -42,6 +42,9 @@ public class Util {
 		    else if (raiz instanceof NodoCallFuncion){
 		    	System.out.println("-> Llamado a funcion: "+((NodoCallFuncion)raiz).getNombre());	
 		    }
+		    else if (raiz instanceof NodoReturn){
+		    	System.out.print("-> Retornar: ");	
+		    }
 		    else System.out.println("Tipo de nodo desconocido");;
 		    
 		    /* Hago el recorrido recursivo */
@@ -107,6 +110,9 @@ public class Util {
 		    		imprimirAST(((NodoCallFuncion)raiz).getArgs());
 		    	}
 		    	
+		    }
+		    else if (raiz instanceof NodoReturn){
+		    	imprimirAST(((NodoReturn)raiz).getExpresion());
 		    }
 		    else if (raiz instanceof  NodoRepeat){
 		    	printSpaces();

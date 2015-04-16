@@ -77,9 +77,6 @@ non terminal NodoBase boolean_stmt;
 non terminal NodoBase sent_for_stmt;
 non terminal NodoBase fuctions_stmt;
 non terminal NodoBase type_f_stmt;
-non terminal NodoBase type_r_stmt;
-non terminal NodoBase type_nr_stmt;
-non terminal NodoBase type_d_stmt;
 non terminal NodoBase args_stmt;
 non terminal NodoBase dec_stmt;
 non terminal NodoBase args_II_stmt;
@@ -124,35 +121,25 @@ fuctions_stmt  ::= type_f_stmt:funcion fuctions_stmt:funciones {:  if(modoDepura
 			| 	/* empty */
 		;
 		
-type_f_stmt ::= type_r_stmt:t  {: if(modoDepuracion) System.out.println("\t regla 21a");
-						RESULT = t;
-					:}
-			|	type_nr_stmt:t{:  if(modoDepuracion) System.out.println("\t regla 21b");
-						RESULT = t;
-					:}
-		; 
-type_r_stmt ::= BOOLEAN ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set RETURN exp SEMI END {: if(modoDepuracion) System.out.println("\t regla 22a");
+type_f_stmt ::= BOOLEAN ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 22a");
 					RESULT= new NodoFuncion("Boolena",nom,arg,set);
 					:}
-			| 	BOOLEAN ID:nom LPAREN  RPAREN BEGIN stmt_seq:set RETURN exp SEMI END {: if(modoDepuracion) System.out.println("\t regla 22b");
+			| 	BOOLEAN ID:nom LPAREN  RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 22b");
 					RESULT= new NodoFuncion("Boolena",nom,set);
 					:}
-			|   INT ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set RETURN exp SEMI END {: if(modoDepuracion) System.out.println("\t regla 22a");
+			|   INT ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 22a");
 					RESULT= new NodoFuncion("Int",nom,arg,set);
 					:}
-			| 	INT ID:nom LPAREN  RPAREN BEGIN stmt_seq:set RETURN exp SEMI END {: if(modoDepuracion) System.out.println("\t regla 22b");
+			| 	INT ID:nom LPAREN  RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 22b");
 					RESULT= new NodoFuncion("Int",nom,set);
 					:}
-			
-		; 
-
-type_nr_stmt ::= VOID ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 23a");
+			|   VOID ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 23a");
 					RESULT= new NodoFuncion("Void",nom,arg,set);
 					:}
 			| 	VOID ID:nom LPAREN  RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 23b");
 					RESULT= new NodoFuncion("Void",nom,set);
 					:}
-		;
+;
 
 args_stmt ::= dec_stmt:argu COMMA args_stmt:lista {: if(modoDepuracion) System.out.println("\t regla 24a");
 					NodoBase hijoActual = argu;
@@ -181,7 +168,7 @@ dec_stmt ::= INT ID:iden {: if(modoDepuracion) System.out.println("\t regla 25a"
 					:}
 		;  
 
-args_II_stmt ::= exp:ex COMMA args_II_stmt:argume {: if(modoDepuracion) System.out.println("\t regla 26a");
+args_II_stmt ::= simple_exp:ex COMMA args_II_stmt:argume {: if(modoDepuracion) System.out.println("\t regla 26a");
 					NodoBase hijoActual = ex;
 						if(hijoActual !=null){
 							while(hijoActual.TieneHermano()){
@@ -193,7 +180,7 @@ args_II_stmt ::= exp:ex COMMA args_II_stmt:argume {: if(modoDepuracion) System.o
 							RESULT=argume;
 						}
 					:}
-			|	exp:ex{: if(modoDepuracion) System.out.println("\t regla 26b");
+			|	simple_exp:ex{: if(modoDepuracion) System.out.println("\t regla 26b");
 					RESULT = ex;
 					:}
 		; 
@@ -237,13 +224,16 @@ stmt        ::= if_stmt:sif	{: if(modoDepuracion) System.out.println("\t regla 3
 					RESULT=sboolean; 
 					:}	
 			| sent_for_stmt:sfor {: RESULT = sfor; :}						
-			|   ID:nom LPAREN RPAREN{: if(modoDepuracion) System.out.println("\t regla 3i");
+			|   ID:nom LPAREN RPAREN{: if(modoDepuracion) System.out.println("\t regla 3h");
 					RESULT = new NodoCallFuncion (nom);
 					:}
-			|ID:nom LPAREN args_II_stmt:arg RPAREN{: if(modoDepuracion) System.out.println("\t regla 3h");
+			|ID:nom LPAREN args_II_stmt:arg RPAREN{: if(modoDepuracion) System.out.println("\t regla 3i");
 					RESULT = new NodoCallFuncion (nom,arg);
 					:}		
-            | error				{: if(modoDepuracion) System.out.println("\t regla 3j"); 
+            | RETURN exp:ex {:		if(modoDepuracion) System.out.println("\t regla 3j");
+            		RESULT= new NodoReturn(ex);
+            	:}
+            | error				{: if(modoDepuracion) System.out.println("\t regla 3k"); 
 				System.out.println("Ocurrio error en cup # 0004");
 				RESULT=null;
 				:}
@@ -266,7 +256,7 @@ assign_stmt ::= ID:variable 	{: if(modoDepuracion) System.out.println("\t regla 
 				/*lineanum=1000; //Pasar/Obtener la linea correcta por el Simbolo
 				String nombre = variable.getName();*/
 				:}
-			ASSIGN exp:ex	{: if(modoDepuracion) System.out.println("\t regla 6 parte final");
+			ASSIGN simple_exp:ex	{: if(modoDepuracion) System.out.println("\t regla 6 parte final");
 					if(variable!=null)
 					RESULT = new NodoAsignacion(variable.toString(),ex);
 					else{
@@ -274,7 +264,7 @@ assign_stmt ::= ID:variable 	{: if(modoDepuracion) System.out.println("\t regla 
 					System.out.println("Ocurrio error en cup # 0001");
 					}
 					:}
-			| array ASSIGN exp	{: RESULT=null; :}
+			| array ASSIGN simple_exp	{: RESULT=null; :}
 		;
 
 read_stmt   ::= READ ID:variable	{: if(modoDepuracion) System.out.println("\t regla 7"); 
@@ -373,10 +363,10 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 						System.out.println("Ocurrio error en cup # 0005");
 					}
 					:}
-		| ID BRALEFT exp BRARIGHT  	{:
+		| ID BRALEFT simple_exp BRARIGHT  	{:
 						if(modoDepuracion) System.out.println("\t regla 12c"); 
 				:}	
-		|MINUS LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\t regla 12a"); 
+		|MINUS LPAREN simple_exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\t regla 12a"); 
 							RESULT = ex;
 							:} %prec UMINUS
 		

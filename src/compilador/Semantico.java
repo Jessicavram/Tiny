@@ -39,6 +39,9 @@ public class Semantico {
 	    else if (raiz instanceof  NodoAsignacion){
 	    	cargarTabla(((NodoAsignacion)raiz).getExpresion());
 	    }
+	    else if (raiz instanceof  NodoReturn){
+	    	cargarTabla(((NodoReturn)raiz).getExpresion());
+	    }
 	    else if (raiz instanceof  NodoEscribir)
 	    	cargarTabla(((NodoEscribir)raiz).getExpresion());
 	    else if (raiz instanceof NodoOperacion){
