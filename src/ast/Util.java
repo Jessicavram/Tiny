@@ -42,11 +42,14 @@ public class Util {
 		    else if (raiz instanceof NodoCallFuncion){
 		    	System.out.println("-> Llamado a funcion: "+((NodoCallFuncion)raiz).getNombre());	
 		    }
+
 		    else if (raiz instanceof NodoVector){
 		    	System.out.println("Nodo Vector: "+((NodoVector)raiz).getNombre()+"Tamaño"+((NodoVector)raiz).getTamano());	
 		    }
-		    else System.out.println("Tipo de nodo desconocido");;
-		    
+		    else if (raiz instanceof NodoReturn){
+		    	System.out.print("-> Retornar: ");	
+		    }
+		    else System.out.println("Tipo de nodo desconocido");		    
 		    /* Hago el recorrido recursivo */
 		    if (raiz instanceof  NodoIf){
 		    	printSpaces();
@@ -120,6 +123,9 @@ public class Util {
 		    		imprimirAST(((NodoCallFuncion)raiz).getArgs());
 		    	}
 		    	
+		    }
+		    else if (raiz instanceof NodoReturn){
+		    	imprimirAST(((NodoReturn)raiz).getExpresion());
 		    }
 		    else if (raiz instanceof  NodoRepeat){
 		    	printSpaces();

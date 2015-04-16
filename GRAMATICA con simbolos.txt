@@ -5,16 +5,12 @@ strut_stmt 		-> fuctions_stmt BEGIN stmt_seq END
 fuctions_stmt  	-> type_f_stmt fuctions_stmt 
 					| 	/* empty */
 
-type_f_stmt 	-> type_r_stmt
-					|	type_nr_stmt
-
-type_r_stmt 	-> type_d ID ( args_stmt ) BEGIN stmt_seq RETURN exp ; END 
-					| type_d ID ( ) BEGIN stmt_seq RETURN exp ; END 
-
 type_d_stmt 	-> INT 		
 					| BOOLEAN
 
-type_nr_stmt 	-> VOID ID:nom ( args_stmt ) BEGIN stmt_seq:set END 
+type_f_stmt 	-> type_d ID ( args_stmt ) BEGIN stmt_seq  END 
+					| type_d ID ( ) BEGIN stmt_seq END 
+					| VOID ID:nom ( args_stmt ) BEGIN stmt_seq:set END 
 					|  VOID ID (  ) BEGIN stmt_seq:set END
 
 args_stmt 		-> dec_stmt , args_stmt 
@@ -35,6 +31,7 @@ stmt        	-> if_stmt
 					| boolean_stmt
 					| sent_for_stmt
 					| call_function
+					| return exp
 					| error
 
 if_stmt     	-> IF exp:ex THEN stmt_seq:pthen END
