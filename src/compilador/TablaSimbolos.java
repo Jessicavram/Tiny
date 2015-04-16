@@ -51,7 +51,9 @@ public class TablaSimbolos {
 	    else if (raiz instanceof NodoFuncion) {
 	    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion    	
 	    	cargarTabla(((NodoFuncion)raiz).getSent());
-	    	cargarTabla(((NodoFuncion)raiz).getArgs());
+	    	
+	    	if( ((NodoFuncion)raiz).getArgs() != null)
+	    		cargarTabla(((NodoFuncion)raiz).getArgs());
 	    } 
 	    else if (raiz instanceof NodoProgram) {
 	    	if(((NodoProgram)raiz).getFunctions()!=null){
@@ -137,8 +139,16 @@ public class TablaSimbolos {
 			return false;
 		}		
 	}
+	
+	public boolean buscarAmbito(String ambito){		
+		if(tabla.containsKey(ambito))
+			return true;
+		else
+			return false;
+	}
 	/*
 	 * TODO:
 	 * 1. Crear lista con las lineas de codigo donde la variable es usada.
 	 * */
 }
+
