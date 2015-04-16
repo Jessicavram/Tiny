@@ -40,6 +40,12 @@ identificador	= {letra}+
 nuevalinea		= \n | \n\r | \r\n
 espacio		= [ \t]+
 %%
+"true"            {	if(debug) System.out.println("token TRUE");
+			return sf.newSymbol("TRUE",sym.TRUE);
+			}
+"false"            {	if(debug) System.out.println("token FALSE");
+			return sf.newSymbol("FALSE",sym.FALSE);
+			}
 "for"            {	if(debug) System.out.println("token FOR");
 			return sf.newSymbol("FOR",sym.FOR);
 			}

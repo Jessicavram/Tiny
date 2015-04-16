@@ -1,7 +1,7 @@
 begin
 int x,v[10];
 
-if(x=4) then
+if(x=true) then
 x:=3;
 end;
 
