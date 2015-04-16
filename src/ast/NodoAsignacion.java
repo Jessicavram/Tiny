@@ -15,7 +15,11 @@ public class NodoAsignacion extends NodoBase {
 		this.identificador = identificador;
 		this.expresion = expresion;
 	}
-
+	public NodoAsignacion(NodoBase vector, NodoBase expresion){
+		super();
+		this.identificador=((NodoIdentificador)vector).getNombre();
+		this.expresion=expresion;
+	}
 	public String getIdentificador() {
 		return identificador;
 	}

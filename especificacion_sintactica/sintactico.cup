@@ -264,7 +264,9 @@ assign_stmt ::= ID:variable 	{: if(modoDepuracion) System.out.println("\t regla 
 					System.out.println("Ocurrio error en cup # 0001");
 					}
 					:}
-			| array ASSIGN simple_exp	{: RESULT=null; :}
+			| array:vector ASSIGN simple_exp:ex	{: 
+				RESULT=new NodoAsignacion(vector,ex); 
+			:}
 		;
 
 read_stmt   ::= READ ID:variable	{: if(modoDepuracion) System.out.println("\t regla 7"); 

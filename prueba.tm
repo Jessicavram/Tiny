@@ -1,5 +1,5 @@
 begin
-int v[10],x;
-x:=x+1;
-y:=v[10];
+int x,v[10];
+
+v[2+x]:=1;
 end

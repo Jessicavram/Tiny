@@ -51,5 +51,8 @@ public class NodoIdentificador extends NodoBase {
 	public NodoBase getSiguiente() {
 		return siguiente;
 	}
+	public NodoBase getExpresion(){
+		return expresion;
+	}
 	
 }

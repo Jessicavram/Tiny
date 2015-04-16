@@ -157,6 +157,9 @@ public class Util {
 		    else if(raiz instanceof NodoIdentificador){
 		    	if(((NodoIdentificador)raiz).getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
 		    		imprimirAST(((NodoIdentificador)raiz).getSiguiente());
+		    	if(((NodoIdentificador)raiz).getExpresion() != null) // Compruebo que el identificador tenga hermanos 
+		    		imprimirAST(((NodoIdentificador)raiz).getExpresion());
+		    	
 		    }		    
 		    raiz = raiz.getHermanoDerecha();
 		  }
@@ -205,10 +208,9 @@ static void imprimirNodo( NodoBase raiz )
 	if(	raiz instanceof NodoIdentificador ){
 		String variable;
 		contador+=1;
-		variable = "ID, nombre= "+ ((NodoIdentificador)raiz).getNombre()+" tamano "+((NodoIdentificador)raiz).getTamano();
-		/*if (((NodoIdentificador)raiz).getTamano() != null)
+		variable = "ID, nombre= "+ ((NodoIdentificador)raiz).getNombre();
+		if (((NodoIdentificador)raiz).getTamano() != null)
 			variable += " -vector, tamano= " + ((NodoIdentificador)raiz).getTamano();
-		*/
 		System.out.println(variable);
 		
 	}
