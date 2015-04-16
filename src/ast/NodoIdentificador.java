@@ -4,6 +4,7 @@ public class NodoIdentificador extends NodoBase {
 	private String nombre;
 	private Integer tamano;
 	private NodoBase siguiente;
+	private NodoBase expresion;
 	
 	public NodoIdentificador(String nombre, Integer tamano) {
 		super();
@@ -18,6 +19,11 @@ public class NodoIdentificador extends NodoBase {
 		this.tamano 	= null;
 		this.siguiente 	= siguiente;		
 	}	
+	public NodoIdentificador(String nombre,NodoBase expresion, NodoBase siguiente){
+		this.nombre= nombre;
+		this.expresion=expresion;
+		this.siguiente=null;
+	}
 	
 	public NodoIdentificador(String nombre) {
 		super();
@@ -29,7 +35,7 @@ public class NodoIdentificador extends NodoBase {
 	public NodoIdentificador(NodoBase actual, NodoBase siguiente) {
 		super();
 		this.nombre 	= ((NodoIdentificador)actual).nombre;
-		this.tamano 	= null;
+		this.tamano 	= ((NodoIdentificador)actual).tamano;
 		this.siguiente 	= siguiente;		
 	}	
 	public NodoIdentificador() {
@@ -44,6 +50,9 @@ public class NodoIdentificador extends NodoBase {
 	}	
 	public NodoBase getSiguiente() {
 		return siguiente;
+	}
+	public NodoBase getExpresion(){
+		return expresion;
 	}
 	
 }

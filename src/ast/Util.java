@@ -42,8 +42,14 @@ public class Util {
 		    else if (raiz instanceof NodoCallFuncion){
 		    	System.out.println("-> Llamado a funcion: "+((NodoCallFuncion)raiz).getNombre());	
 		    }
-		    else System.out.println("Tipo de nodo desconocido");;
-		    
+
+		    else if (raiz instanceof NodoVector){
+		    	System.out.println("Nodo Vector: "+((NodoVector)raiz).getNombre()+"Tamaño"+((NodoVector)raiz).getTamano());	
+		    }
+		    else if (raiz instanceof NodoReturn){
+		    	System.out.print("-> Retornar: ");	
+		    }
+		    else System.out.println("Tipo de nodo desconocido");		    
 		    /* Hago el recorrido recursivo */
 		    if (raiz instanceof  NodoIf){
 		    	printSpaces();
@@ -70,7 +76,17 @@ public class Util {
 		    	printSpaces();
 		    	System.out.println("**Bloque**");
 		    	imprimirAST(((NodoFor)raiz).getCuerpo());
-		    }
+		    }else if (raiz instanceof NodoVector){
+		    	printSpaces();
+		    	if(((NodoVector)raiz).getExpresion()!=null){
+		    	System.out.println("***Expresion***");
+		    	imprimirAST(((NodoVector)raiz).getExpresion());
+		    	}
+		    	if(((NodoVector)raiz).getSiguiente()!=null){
+		    	System.out.println("***Siguiente***");
+		    	imprimirAST(((NodoVector)raiz).getSiguiente());
+		    	}
+		    }		    
 		    else if (raiz instanceof NodoProgram){
 		    	printSpaces();
 		    	if(((NodoProgram)raiz).getFunctions()!=null){
@@ -108,6 +124,9 @@ public class Util {
 		    	}
 		    	
 		    }
+		    else if (raiz instanceof NodoReturn){
+		    	imprimirAST(((NodoReturn)raiz).getExpresion());
+		    }
 		    else if (raiz instanceof  NodoRepeat){
 		    	printSpaces();
 		    	System.out.println("**Cuerpo REPEAT**");
@@ -138,6 +157,9 @@ public class Util {
 		    else if(raiz instanceof NodoIdentificador){
 		    	if(((NodoIdentificador)raiz).getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
 		    		imprimirAST(((NodoIdentificador)raiz).getSiguiente());
+		    	if(((NodoIdentificador)raiz).getExpresion() != null) // Compruebo que el identificador tenga hermanos 
+		    		imprimirAST(((NodoIdentificador)raiz).getExpresion());
+		    	
 		    }		    
 		    raiz = raiz.getHermanoDerecha();
 		  }
