@@ -43,9 +43,7 @@ public class Util {
 		    	System.out.println("-> Llamado a funcion: "+((NodoCallFuncion)raiz).getNombre());	
 		    }
 
-		    else if (raiz instanceof NodoVector){
-		    	System.out.println("Nodo Vector: "+((NodoVector)raiz).getNombre()+"Tamaño"+((NodoVector)raiz).getTamano());	
-		    }
+		   
 		    else if (raiz instanceof NodoReturn){
 		    	System.out.print("-> Retornar: ");	
 		    }
@@ -76,16 +74,6 @@ public class Util {
 		    	printSpaces();
 		    	System.out.println("**Bloque**");
 		    	imprimirAST(((NodoFor)raiz).getCuerpo());
-		    }else if (raiz instanceof NodoVector){
-		    	printSpaces();
-		    	if(((NodoVector)raiz).getExpresion()!=null){
-		    	System.out.println("***Expresion***");
-		    	imprimirAST(((NodoVector)raiz).getExpresion());
-		    	}
-		    	if(((NodoVector)raiz).getSiguiente()!=null){
-		    	System.out.println("***Siguiente***");
-		    	imprimirAST(((NodoVector)raiz).getSiguiente());
-		    	}
 		    }		    
 		    else if (raiz instanceof NodoProgram){
 		    	printSpaces();
