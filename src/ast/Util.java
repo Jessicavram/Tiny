@@ -123,8 +123,14 @@ public class Util {
 		    	System.out.println("**Prueba REPEAT**");
 		    	imprimirAST(((NodoRepeat)raiz).getPrueba());
 		    }
-		    else if (raiz instanceof  NodoAsignacion)
+		    else if (raiz instanceof  NodoAsignacion){
+		    	if(((NodoAsignacion)raiz).getPosicion()!=null){
+		    		System.out.println("En la Posicion");
+		    		imprimirAST(((NodoAsignacion)raiz).getPosicion());
+		    	}
+		    	System.out.println("**El valor/epresion**");
 		    	imprimirAST(((NodoAsignacion)raiz).getExpresion());
+		    }
 		    else if (raiz instanceof  NodoEscribir)
 		    	imprimirAST(((NodoEscribir)raiz).getExpresion());
 		    else if (raiz instanceof NodoOperacion){
