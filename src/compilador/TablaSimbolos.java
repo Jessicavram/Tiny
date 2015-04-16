@@ -51,6 +51,7 @@ public class TablaSimbolos {
 	    else if (raiz instanceof NodoFuncion) {
 	    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion    	
 	    	cargarTabla(((NodoFuncion)raiz).getSent());
+	    	cargarTabla(((NodoFuncion)raiz).getArgs());
 	    } 
 	    else if (raiz instanceof NodoProgram) {
 	    	if(((NodoProgram)raiz).getFunctions()!=null){
@@ -118,10 +119,10 @@ public class TablaSimbolos {
 		return 1;
 	}
 	
-	public RegistroSimbolo getTipo(String ambito, String identificador){
+	public String getTipo(String ambito, String identificador){
 		this.tablaAmbito = tabla.get(ambito);
 		RegistroSimbolo simbolo=(RegistroSimbolo)tablaAmbito.get(identificador);
-		return simbolo;
+		return simbolo.getTipo();
 	}
 	
 	public boolean buscarTabla(String ambito, String identificador){
