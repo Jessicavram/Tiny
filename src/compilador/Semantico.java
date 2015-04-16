@@ -140,7 +140,8 @@ public class Semantico {
 		}
 		else if(nodo instanceof NodoValor){	
 			// falta mejorar
-			((NodoValor)nodo).getValor() ;
+			((NodoValor)nodo).getValor();
+			return "Int";
 		}
 		
 		return "";
