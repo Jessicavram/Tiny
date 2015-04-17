@@ -394,6 +394,8 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 					RESULT = new NodoCallFuncion (nom,arg);
 					
 					:}		
+		|TRUE {:  :}
+		|FALSE {:  :}
 		| error	{: if(modoDepuracion) System.out.println("\t regla 12f"); 
 				System.out.println("Ocurrio error en cup # 0003");
 				RESULT=null;
