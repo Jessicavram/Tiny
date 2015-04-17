@@ -6,6 +6,7 @@ import java.util.*;
 import ast.*;
 
 public class TablaSimbolos {
+	private HashMap < Funcion, HashMap<String, RegistroSimbolo>> tabla1;
 	private HashMap<String, HashMap<String, RegistroSimbolo>> tabla;
 	private HashMap<String, RegistroSimbolo> tablaAmbito;
 	private int direccion;  //Contador de las localidades de memoria asignadas a la tabla
@@ -43,8 +44,15 @@ public class TablaSimbolos {
 	    else if (raiz instanceof NodoDeclaracion) {
 	    	// Inserto el primer identificador y busco guardo el tipo de la declaracion que estoy recorriendo
 	    	ultimoTipo = ((NodoDeclaracion)raiz).getTipo();  
-	    	NodoBase nodo=  ((NodoDeclaracion) raiz).getVariable(); 	
-	    	InsertarSimbolo(((NodoIdentificador)nodo).getNombre(),ultimoAmbito, ultimoTipo);
+	    	NodoBase nodo	=  ((NodoDeclaracion) raiz).getVariable(); 
+	    	Integer tamano 	= 1;
+	    	
+	    	// Si es un vector
+	    	if(((NodoIdentificador)nodo).getTamano() != null)
+	    		tamano = ((NodoIdentificador)nodo).getTamano();
+	    	
+	    	InsertarSimbolo(((NodoIdentificador)nodo).getNombre(),ultimoAmbito, ultimoTipo, tamano);
+	    	
 	    	cargarIdentificadores((NodoIdentificador)nodo);
 	    	
 	    } 	    
@@ -68,13 +76,19 @@ public class TablaSimbolos {
 	}
 	
 	public void cargarIdentificadores(NodoIdentificador identificador){
-    	InsertarSimbolo(identificador.getNombre(),ultimoAmbito, ultimoTipo); 
+    	Integer tamano 	= 1;
+    	
+    	// Si es un vector
+    	if(((NodoIdentificador)identificador).getTamano() != null)
+    		tamano = ((NodoIdentificador)identificador).getTamano();
+    	
+    	InsertarSimbolo(identificador.getNombre(),ultimoAmbito, ultimoTipo,tamano); 
     	if(identificador.getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
     		cargarIdentificadores((NodoIdentificador)identificador.getSiguiente());	  	
 	}
 	
 	//true es nuevo no existe se insertara, false ya existe NO se vuelve a insertar 
-	public boolean InsertarSimbolo(String identificador, String ambito, String tipo){
+	public boolean InsertarSimbolo(String identificador, String ambito, String tipo,Integer tamano){
 		RegistroSimbolo simbolo;
 		
 
@@ -84,14 +98,16 @@ public class TablaSimbolos {
 			if(tablaAmbito.containsKey(identificador)){
 				return false; // si existe no lo creo
 			} else {
-				simbolo= new RegistroSimbolo(identificador,-1, direccion++, tipo);
+				simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo);
+				direccion = direccion + tamano;
 				tablaAmbito.put(identificador, simbolo);
 				return true;
 			}	
 		} else {
-			// Si el ambito no existe creo la nueva tabla para ambito
+			// Si el ambito no existe creo la nueva tabla para ambito			
 			tablaAmbito = new HashMap<String, RegistroSimbolo>();
-			simbolo= new RegistroSimbolo(identificador,-1, direccion++, tipo);
+			simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo);
+			direccion = direccion + tamano;
 			tablaAmbito.put(identificador, simbolo);			
 			tabla.put(ambito, tablaAmbito);
 			return true;
@@ -140,7 +156,8 @@ public class TablaSimbolos {
 		}		
 	}
 	
-	public boolean buscarAmbito(String ambito){		
+	public boolean buscarAmbito(String ambito){	
+
 		if(tabla.containsKey(ambito))
 			return true;
 		else
