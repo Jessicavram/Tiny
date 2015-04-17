@@ -275,7 +275,7 @@ assign_stmt ::= ID:variable 	{: if(modoDepuracion) System.out.println("\t regla 
 			:}
 		;
 
-read_stmt   ::= READ ID:variable	{: if(modoDepuracion) System.out.println("\t regla 7"); 
+read_stmt   ::=  READ ID:variable	{: if(modoDepuracion) System.out.println("\t regla 7"); 
 					System.out.println("Leyendo Variable");
 					if(variable!=null)
 					RESULT = new NodoLeer(variable.toString());
@@ -284,6 +284,14 @@ read_stmt   ::= READ ID:variable	{: if(modoDepuracion) System.out.println("\t re
 					System.out.println("Ocurrio error en cup # 0002");
 					}
 					:}
+				| READ array:vector  {:
+				    if(vector!=null)
+				    RESULT= new NodoLeer(vector);
+				    else{
+				    RESULT=null;
+				    System.out.println("Ocurrio error en cup # 0003");
+				    }
+				 :}
 		;
 
 write_stmt  ::= WRITE exp:ex	{: if(modoDepuracion) System.out.println("\t regla 8"); 

@@ -61,6 +61,11 @@ public class Util {
 		    		System.out.println("**Else IF**");
 		    		imprimirAST(((NodoIf)raiz).getParteElse());
 		    	}
+		    }else if(raiz instanceof NodoLeer){
+		    	printSpaces();
+		    	System.out.println("**Posicion a Leer **");
+		    	imprimirAST(((NodoLeer)raiz).getPosicion());
+		    	
 		    }else if (raiz instanceof NodoFor){
 		    	printSpaces();
 		    	System.out.println("**Asignacion For**");

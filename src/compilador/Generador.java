@@ -59,6 +59,7 @@ public class Generador {
 	//prerequisito: Fijar la tabla de simbolos antes de generar el codigo objeto 
 	private static void generar(NodoBase nodo){
 	if(tablaSimbolos!=null){
+		
 		if (nodo instanceof  NodoIf){
 			generarIf(nodo);
 		}else if (nodo instanceof  NodoRepeat){
@@ -77,7 +78,10 @@ public class Generador {
 			generarIdentificador(nodo);
 		}else if (nodo instanceof NodoOperacion){
 			generarOperacion(nodo);
-		}else{
+		}else if (nodo instanceof NodoDeclaracion){
+			generar(nodo.getHermanoDerecha());
+		}
+		else{
 			System.out.println("BUG: Tipo de nodo a generar desconocido");
 		}
 		/*Si el hijo de extrema izquierda tiene hermano a la derecha lo genero tambien*/
