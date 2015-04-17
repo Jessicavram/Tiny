@@ -70,6 +70,9 @@ public class Semantico {
 		    } 	    
 		    else if (raiz instanceof NodoFuncion) {
 		    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion    	    	
+		    	//Buscar el return
+		    	if(( (((NodoFuncion)raiz).getTipo())=="Int" || (((NodoFuncion)raiz).getTipo())=="Boolean") && !recorrerFuncion(((NodoFuncion)raiz).getSent(),((NodoFuncion)raiz).getTipo(),((NodoFuncion)raiz).getNombre()))
+		    		printError("La funcion "+((NodoFuncion)raiz).getNombre()+" debe contener una clausula RETURN");
 		    	recorrerArbol(((NodoFuncion)raiz).getSent());
 		    } 
 		    else if (raiz instanceof NodoProgram) {
@@ -168,5 +171,17 @@ public class Semantico {
 		System.err.println(chain);
 		System.exit(0);
 	}	
+	private boolean recorrerFuncion(NodoBase raiz,String Tipo,String nombre){
+		boolean ban=false;
+		while (raiz != null) {
+			if(raiz instanceof NodoReturn){				
+			    ban=true;
+			    if (comprobarTipo(((NodoReturn)raiz).getExpresion())!=Tipo)
+			    	System.err.println("El tipo de dato retornado en la funcion "+nombre+" no corresponde. Debe ser tipo "+Tipo);
+			}
+			raiz = raiz.getHermanoDerecha();
+		}
+		return ban;
+	}
 }
 
