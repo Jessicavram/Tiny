@@ -1,9 +1,7 @@
 begin
-int x,v[10];
+boolean x,v[10];
+int y;
 
-if(x=true) then
-x:=3;
-end;
-
+x:=true and x<2;
 
 end

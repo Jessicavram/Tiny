@@ -142,8 +142,17 @@ public class Semantico {
 		}
 		else if(nodo instanceof NodoValor){	
 			// falta mejorar
-			//((NodoValor)nodo).getValor() ;
 			String tipoValor="Int";
+			Integer tipo;
+			tipo= ((NodoValor)nodo).getTipo();
+			//((NodoValor)nodo).getValor() ;
+			if(tipo==0){
+				tipoValor="Int";
+			}
+			
+			if(tipo==1){
+				tipoValor="Boolean";	
+			}
 			return tipoValor;
 		}
 		

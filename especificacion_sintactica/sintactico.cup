@@ -256,7 +256,7 @@ assign_stmt ::= ID:variable 	{: if(modoDepuracion) System.out.println("\t regla 
 				/*lineanum=1000; //Pasar/Obtener la linea correcta por el Simbolo
 				String nombre = variable.getName();*/
 				:}
-			ASSIGN simple_exp:ex	{: if(modoDepuracion) System.out.println("\t regla 6 parte final");
+			ASSIGN exp:ex	{: if(modoDepuracion) System.out.println("\t regla 6 parte final");
 					if(variable!=null)
 					RESULT = new NodoAsignacion(variable.toString(),ex);
 					else{
@@ -394,8 +394,8 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 					RESULT = new NodoCallFuncion (nom,arg);
 					
 					:}		
-		|TRUE {:  :}
-		|FALSE {:  :}
+		|TRUE {:  RESULT= new NodoValor(1,1); :}
+		|FALSE {: RESULT= new NodoValor(0,1); :}
 		| error	{: if(modoDepuracion) System.out.println("\t regla 12f"); 
 				System.out.println("Ocurrio error en cup # 0003");
 				RESULT=null;
