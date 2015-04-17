@@ -4,7 +4,7 @@ import java_cup.runtime.*;
 import ast.*;
 
 action code {:
-	private boolean modoDepuracion=true;
+	private boolean modoDepuracion=false;
 	private NodoBase ast=null;
 	private int lineanum=0;
 	
@@ -122,10 +122,10 @@ fuctions_stmt  ::= type_f_stmt:funcion fuctions_stmt:funciones {:  if(modoDepura
 		;
 		
 type_f_stmt ::= BOOLEAN ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 22a");
-					RESULT= new NodoFuncion("Boolena",nom,arg,set);
+					RESULT= new NodoFuncion("Boolean",nom,arg,set);
 					:}
 			| 	BOOLEAN ID:nom LPAREN  RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 22b");
-					RESULT= new NodoFuncion("Boolena",nom,set);
+					RESULT= new NodoFuncion("Boolean",nom,set);
 					:}
 			|   INT ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 22a");
 					RESULT= new NodoFuncion("Int",nom,arg,set);

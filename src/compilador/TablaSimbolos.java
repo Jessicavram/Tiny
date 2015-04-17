@@ -6,7 +6,7 @@ import java.util.*;
 import ast.*;
 
 public class TablaSimbolos {
-	private HashMap < Funcion, HashMap<String, RegistroSimbolo>> tabla1;
+	private HashMap <String,String> tablaFunciones;
 	private HashMap<String, HashMap<String, RegistroSimbolo>> tabla;
 	private HashMap<String, RegistroSimbolo> tablaAmbito;
 	private int direccion;  //Contador de las localidades de memoria asignadas a la tabla
@@ -15,6 +15,7 @@ public class TablaSimbolos {
 	public TablaSimbolos() {
 		super();
 		tabla = new HashMap<String, HashMap<String, RegistroSimbolo>>();
+		tablaFunciones = new HashMap<String, String>();
 		direccion=0;
 	}
 
@@ -45,19 +46,15 @@ public class TablaSimbolos {
 	    	// Inserto el primer identificador y busco guardo el tipo de la declaracion que estoy recorriendo
 	    	ultimoTipo = ((NodoDeclaracion)raiz).getTipo();  
 	    	NodoBase nodo	=  ((NodoDeclaracion) raiz).getVariable(); 
-	    	Integer tamano 	= 1;
-	    	
-	    	// Si es un vector
-	    	if(((NodoIdentificador)nodo).getTamano() != null)
-	    		tamano = ((NodoIdentificador)nodo).getTamano();
-	    	
-	    	InsertarSimbolo(((NodoIdentificador)nodo).getNombre(),ultimoAmbito, ultimoTipo, tamano);
 	    	
 	    	cargarIdentificadores((NodoIdentificador)nodo);
 	    	
 	    } 	    
 	    else if (raiz instanceof NodoFuncion) {
-	    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion    	
+	    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion
+	    	
+	    	if(ultimoAmbito != "MAIN")
+	    		tablaFunciones.put(ultimoAmbito, ((NodoFuncion)raiz).getTipo());
 	    	cargarTabla(((NodoFuncion)raiz).getSent());
 	    	
 	    	if( ((NodoFuncion)raiz).getArgs() != null)
@@ -77,21 +74,20 @@ public class TablaSimbolos {
 	
 	public void cargarIdentificadores(NodoIdentificador identificador){
     	Integer tamano 	= 1;
-    	
     	// Si es un vector
     	if(((NodoIdentificador)identificador).getTamano() != null)
     		tamano = ((NodoIdentificador)identificador).getTamano();
     	
-    	InsertarSimbolo(identificador.getNombre(),ultimoAmbito, ultimoTipo,tamano); 
+    	if(!InsertarSimbolo(identificador.getNombre(),ultimoAmbito, ultimoTipo,tamano))
+    		printError("Variable " +identificador.getNombre()+" ya ha sido declarada en el ambito " + ultimoAmbito);
     	if(identificador.getSiguiente() != null) // Compruebo que el identificador tenga hermanos 
     		cargarIdentificadores((NodoIdentificador)identificador.getSiguiente());	  	
 	}
 	
 	//true es nuevo no existe se insertara, false ya existe NO se vuelve a insertar 
 	public boolean InsertarSimbolo(String identificador, String ambito, String tipo,Integer tamano){
-		RegistroSimbolo simbolo;
 		
-
+		RegistroSimbolo simbolo;
 		// Si existe el ambito busco su tabla con los simbolos
 		if(tabla.containsKey(ambito)){
 			tablaAmbito = tabla.get(ambito);
@@ -156,6 +152,10 @@ public class TablaSimbolos {
 		}		
 	}
 	
+	public String getTipoFuncion(String funcion){		
+		return tablaFunciones.get(funcion);
+	}
+	
 	public boolean buscarAmbito(String ambito){	
 
 		if(tabla.containsKey(ambito))
@@ -163,6 +163,11 @@ public class TablaSimbolos {
 		else
 			return false;
 	}
+	
+	private void printError(Object chain){		
+		System.err.println("[Error Semantico]: "+chain);
+//		System.exit(0);
+	}	
 	/*
 	 * TODO:
 	 * 1. Crear lista con las lineas de codigo donde la variable es usada.

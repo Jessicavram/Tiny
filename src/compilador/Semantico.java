@@ -27,7 +27,7 @@ public class Semantico {
 		    /* Hago el recorrido recursivo */
 		    if (raiz instanceof  NodoIf){
 		    	if (comprobarTipo(((NodoIf)raiz).getPrueba()) != "Boolean")
-		    	printError("Error: no se puede probar la expresion en el if");
+		    	printError("No se puede probar la expresion en el if");
 		    	
 		    	recorrerArbol(((NodoIf)raiz).getParteThen());
 		    	if(((NodoIf)raiz).getParteElse()!=null){
@@ -38,7 +38,7 @@ public class Semantico {
 		    else if (raiz instanceof  NodoRepeat){
 		    	recorrerArbol(((NodoRepeat)raiz).getCuerpo());
 		    	if (comprobarTipo(((NodoIf)raiz).getPrueba()) != "Boolean")
-		    		printError("Error: no se puede probar la expresion en el if");
+		    		printError("No se puede probar la expresion en el if");
 		    }
 		    else if (raiz instanceof  NodoAsignacion){	    	
 		    	// Compruebo que la variable a asignar ha sido declara en el ambito
@@ -90,7 +90,6 @@ public class Semantico {
 		
 	
 	private String comprobarTipo(NodoBase nodo){
-		print(nodo);
 		if (nodo instanceof NodoOperacion){
 			if(((NodoOperacion)nodo).getOperacion() == tipoOp.and || ((NodoOperacion)nodo).getOperacion() == tipoOp.or){
 				// Verificar que tipo izquierdo y derecho sean boolean				
@@ -115,8 +114,6 @@ public class Semantico {
 					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.entre){ 
 				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
 				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
-				print(tipoIzquierdo);
-				print(tipoDerecho);
 				if( tipoIzquierdo == "Int" && tipoDerecho == "Int")									
 					return "Int";
 				else
@@ -133,7 +130,7 @@ public class Semantico {
 		}
 		else if(nodo instanceof NodoCallFuncion){
 			// Falta que callfuncion tenga tipo y redevolverlo
-
+			return tablaSimbolos.getTipoFuncion( ((NodoCallFuncion)nodo).getNombre() ) ;
 	    			
 		}
 		
@@ -158,7 +155,7 @@ public class Semantico {
 	private boolean verificarExistenciaDeVariable(String identificador){ 
     	// Compruebo que la variable ha sido declara en el ambito
     	if(!tablaSimbolos.buscarTabla(ultimoAmbito, identificador)){
-    		printError("Error Semantico: La variable " + identificador +" en la funcion "+ ultimoAmbito + " no ha sido declarado");
+    		printError("La variable " + identificador +" en la funcion "+ ultimoAmbito + " no ha sido declarado");
     		return false;
     	} else {
     		return true;
@@ -170,8 +167,8 @@ public class Semantico {
 	}
 	
 	private void printError(Object chain){		
-		System.err.println(chain);
-		System.exit(0);
+		System.err.println("[Error Semantico]: "+chain);
+//		System.exit(0);
 	}	
 	private boolean recorrerFuncion(NodoBase raiz,String Tipo,String nombre){
 		boolean ban=false;
