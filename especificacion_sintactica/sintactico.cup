@@ -6,11 +6,17 @@ import ast.*;
 action code {:
 	private boolean modoDepuracion=true;
 	private NodoBase ast=null;
-	private int lineanum=0;
+	public int lineanum=0;
 	
 	//Debe ser llamada solo despues de un parse(), en caso contrario retornara null siempre;
 	public NodoBase getASTroot(){
 		return ast;
+	}
+:}
+
+parser code {:
+	public void	syntax_error(Symbol cur_token){
+		System.err.println("[Error Sintatico]: Linea "+ cur_token.value );
 	}
 :}
 
@@ -122,10 +128,10 @@ fuctions_stmt  ::= type_f_stmt:funcion fuctions_stmt:funciones {:  if(modoDepura
 		;
 		
 type_f_stmt ::= BOOLEAN ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 22a");
-					RESULT= new NodoFuncion("Boolena",nom,arg,set);
+					RESULT= new NodoFuncion("Boolean",nom,arg,set);
 					:}
 			| 	BOOLEAN ID:nom LPAREN  RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 22b");
-					RESULT= new NodoFuncion("Boolena",nom,set);
+					RESULT= new NodoFuncion("Boolean",nom,set);
 					:}
 			|   INT ID:nom LPAREN args_stmt:arg RPAREN BEGIN stmt_seq:set END {: if(modoDepuracion) System.out.println("\t regla 22a");
 					RESULT= new NodoFuncion("Int",nom,arg,set);
@@ -348,13 +354,13 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 							RESULT = ex;
 							:}
 		| NUM:valor	{: if(modoDepuracion) System.out.println("\t regla 12b"); 
-					System.out.println("Devolvi nodo numero entero");
 					if(valor!=null){
 						RESULT= new NodoValor(valor);					
 					}else{
 						RESULT = null;
 						System.out.println("Ocurrio error en cup # 0005");
 					}
+					System.out.println("ddddd"+valor);
 					:}
 		| ID:variable	{: if(modoDepuracion) System.out.println("\t regla 12c"); 
 					if(variable!=null){
