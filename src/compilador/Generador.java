@@ -80,8 +80,11 @@ public class Generador {
 			generarOperacion(nodo);
 		}else if (nodo instanceof NodoDeclaracion){
 			generar(nodo.getHermanoDerecha());
-		}
-		else{
+		}else if (nodo instanceof NodoProgram){
+			generarProgram(nodo);
+		}else if (nodo instanceof NodoFuncion){
+			generarFuncion(nodo);
+		}else{
 			System.out.println("BUG: Tipo de nodo a generar desconocido");
 		}
 		/*Si el hijo de extrema izquierda tiene hermano a la derecha lo genero tambien*/
@@ -266,6 +269,18 @@ public class Generador {
 							UtGen.emitirComentario("BUG: tipo de operacion desconocida");
 		}
 		if(UtGen.debug)	UtGen.emitirComentario("<- Operacion: " + n.getOperacion());
+	}
+	private static void generarProgram(NodoBase nodo){
+		if(((NodoProgram) nodo).getFunctions()!=null){
+			generar(((NodoProgram) nodo).getFunctions());
+	}
+		if(((NodoProgram) nodo).getMain()!=null)
+			generar(((NodoProgram) nodo).getMain());
+	}
+	private static void generarFuncion(NodoBase nodo){
+			NodoFuncion n = (NodoFuncion)nodo;
+			if(n.getSent()!=null)
+				generar(n.getSent());
 	}
 	
 	//TODO: enviar preludio a archivo de salida, obtener antes su nombre
