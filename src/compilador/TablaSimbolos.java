@@ -7,7 +7,8 @@ import ast.*;
 
 public class TablaSimbolos {
 	private HashMap <String,String> tablaFunciones;
-	public ArrayList arrayArgumentos;
+	private HashMap <String, Integer> tablaiMen;
+	public ArrayList<String> arrayArgumentos;
 	private HashMap <String,ArrayList<String>> tablaConArgumentos;
 	private HashMap<String, HashMap<String, RegistroSimbolo>> tabla;
 	private HashMap<String, RegistroSimbolo> tablaAmbito;
@@ -196,6 +197,14 @@ public class TablaSimbolos {
 	public void setUltimoAmbito(String Ambito)
 	{
 		ultimoAmbito = Ambito;
+	}
+	
+	public void setiMem(String ambito, Integer linea){
+		tablaiMen.put(ambito, linea);
+	}
+	
+	public Integer getiMem(String ambito, Integer linea){
+		return tablaiMen.get(ambito);
 	}
 	/*
 	 * TODO:
