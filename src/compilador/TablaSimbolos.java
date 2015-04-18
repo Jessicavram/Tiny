@@ -7,6 +7,8 @@ import ast.*;
 
 public class TablaSimbolos {
 	private HashMap <String,String> tablaFunciones;
+	public ArrayList arrayArgumentos;
+	private HashMap <String,ArrayList<String>> tablaConArgumentos;
 	private HashMap<String, HashMap<String, RegistroSimbolo>> tabla;
 	private HashMap<String, RegistroSimbolo> tablaAmbito;
 	private int direccion;  //Contador de las localidades de memoria asignadas a la tabla
@@ -16,6 +18,7 @@ public class TablaSimbolos {
 		super();
 		tabla = new HashMap<String, HashMap<String, RegistroSimbolo>>();
 		tablaFunciones = new HashMap<String, String>();
+		tablaConArgumentos = new HashMap<String, ArrayList<String>>();
 		direccion=0;
 	}
 
@@ -55,10 +58,16 @@ public class TablaSimbolos {
 	    	
 	    	if(ultimoAmbito != "MAIN")
 	    		tablaFunciones.put(ultimoAmbito, ((NodoFuncion)raiz).getTipo());
+	    	
+	    	if( ((NodoFuncion)raiz).getArgs() != null){
+	    		cargarTabla(((NodoFuncion)raiz).getArgs());
+	    		arrayArgumentos = new ArrayList<String>();
+	    		cargarAgumentos(((NodoFuncion)raiz).getArgs());
+	    		tablaConArgumentos.put(ultimoAmbito, arrayArgumentos);
+	    	}
 	    	cargarTabla(((NodoFuncion)raiz).getSent());
 	    	
-	    	if( ((NodoFuncion)raiz).getArgs() != null)
-	    		cargarTabla(((NodoFuncion)raiz).getArgs());
+
 	    } 
 	    else if (raiz instanceof NodoProgram) {
 	    	if(((NodoProgram)raiz).getFunctions()!=null){
@@ -84,9 +93,20 @@ public class TablaSimbolos {
     		cargarIdentificadores((NodoIdentificador)identificador.getSiguiente());	  	
 	}
 	
+	private void cargarAgumentos(NodoBase nodo){
+    	String tipoArgumento = ((NodoDeclaracion)nodo).getTipo();
+    	arrayArgumentos.add(tipoArgumento);
+		if (((NodoDeclaracion)nodo).getHermanoDerecha() != null)
+			cargarAgumentos(((NodoDeclaracion)nodo).getHermanoDerecha());
+	}
+	
 	//true es nuevo no existe se insertara, false ya existe NO se vuelve a insertar 
 	public boolean InsertarSimbolo(String identificador, String ambito, String tipo,Integer tamano){
 		
+		if(tamano == 0){
+			printError("El vector " +identificador+"  no puede ser declarado de tamaño 0" );
+			return false;
+		}
 		RegistroSimbolo simbolo;
 		// Si existe el ambito busco su tabla con los simbolos
 		if(tabla.containsKey(ambito)){
@@ -154,6 +174,10 @@ public class TablaSimbolos {
 	
 	public String getTipoFuncion(String funcion){		
 		return tablaFunciones.get(funcion);
+	}
+	
+	public ArrayList<String> getArrayArguments(String ambito){
+		return tablaConArgumentos.get(ambito);
 	}
 	
 	public boolean buscarAmbito(String ambito){	
