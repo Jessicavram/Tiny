@@ -1,7 +1,10 @@
 begin
-boolean x,v[10];
-int y;
+int x,v[10];
 
-x:=true and x<2;
+read x;
+
+for(x:=0;x<10;x:=x+1) 
+	write x;
+end;
 
 end

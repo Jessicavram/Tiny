@@ -34,7 +34,7 @@ public class Generador {
 	 */
 	private static int desplazamientoTmp = 0;
 	private static TablaSimbolos tablaSimbolos = null;
-	private String ultimoAmbito;
+	private static String ultimoAmbito;
 	public static void setTablaSimbolos(TablaSimbolos tabla){
 		tablaSimbolos = tabla;
 	}
@@ -59,10 +59,13 @@ public class Generador {
 	//prerequisito: Fijar la tabla de simbolos antes de generar el codigo objeto 
 	private static void generar(NodoBase nodo){
 	if(tablaSimbolos!=null){
+		
 		if (nodo instanceof  NodoIf){
 			generarIf(nodo);
 		}else if (nodo instanceof  NodoRepeat){
 			generarRepeat(nodo);
+		}else if (nodo instanceof NodoFor){
+			generarFor(nodo);
 		}else if (nodo instanceof  NodoAsignacion){
 			generarAsignacion(nodo);
 		}else if (nodo instanceof  NodoLeer){
@@ -76,7 +79,13 @@ public class Generador {
 		}else if (nodo instanceof NodoOperacion){
 			generarOperacion(nodo);
 		}else if (nodo instanceof NodoDeclaracion){
-			
+			generar(nodo.getHermanoDerecha());
+		}else if (nodo instanceof NodoProgram){
+			ultimoAmbito = "main";
+			generarProgram(nodo);
+		}else if (nodo instanceof NodoFuncion){
+			ultimoAmbito = ((NodoFuncion)nodo).getNombre();
+			generarFuncion(nodo);
 		}else{
 			System.out.println("BUG: Tipo de nodo a generar desconocido");
 		}
@@ -129,7 +138,29 @@ public class Generador {
 			UtGen.emitirRM_Abs("JEQ", UtGen.AC, localidadSaltoInicio, "repeat: jmp hacia el inicio del cuerpo");
 		if(UtGen.debug)	UtGen.emitirComentario("<- repeat");
 	}		
-	
+	private static void generarFor(NodoBase nodo){
+    	NodoFor n = (NodoFor)nodo;
+		int localidadSaltoInicio;
+		int localidadSaltoEnd;
+		int localidadActual;
+		if(UtGen.debug)	UtGen.emitirComentario("-> For");
+			generar(n.getAsignacion());
+			localidadSaltoInicio = UtGen.emitirSalto(0);
+			UtGen.emitirComentario("for: el salto hacia el final (luego del cuerpo) del for debe estar aqui");
+			/* Genero el cuerpo del for */
+			generar(n.getPrueba());
+			localidadSaltoEnd = UtGen.emitirSalto(1);
+			generar(n.getCuerpo());
+			/* Genero el codigo de la prueba del repeat */
+		    generar(n.getPaso());
+		    UtGen.emitirRM_Abs("LDA", UtGen.PC, localidadSaltoInicio, "if: jmp hacia el inicio");
+		    localidadActual = UtGen.emitirSalto(0);
+		    UtGen.cargarRespaldo(localidadSaltoEnd);
+		    UtGen.emitirRM_Abs("JEQ", UtGen.AC, localidadActual, "for: jmp hacia el fin del cuerpo");
+		    UtGen.restaurarRespaldo();	
+		if(UtGen.debug)	UtGen.emitirComentario("<- for");
+	}		
+		
 	private static void generarAsignacion(NodoBase nodo){
 		NodoAsignacion n = (NodoAsignacion)nodo;
 		int direccion;
@@ -137,7 +168,7 @@ public class Generador {
 		/* Genero el codigo para la expresion a la derecha de la asignacion */
 		generar(n.getExpresion());
 		/* Ahora almaceno el valor resultante */
-		direccion = tablaSimbolos.getDireccion(n.getIdentificador());
+		direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
 		UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "asignacion: almaceno el valor para el id "+n.getIdentificador());
 		if(UtGen.debug)	UtGen.emitirComentario("<- asignacion");
 	}
@@ -147,7 +178,7 @@ public class Generador {
 		int direccion;
 		if(UtGen.debug)	UtGen.emitirComentario("-> leer");
 		UtGen.emitirRO("IN", UtGen.AC, 0, 0, "leer: lee un valor entero ");
-		direccion = tablaSimbolos.getDireccion(n.getIdentificador());
+		direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
 		UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "leer: almaceno el valor entero leido en el id "+n.getIdentificador());
 		if(UtGen.debug)	UtGen.emitirComentario("<- leer");
 	}
@@ -173,7 +204,7 @@ public class Generador {
 		NodoIdentificador n = (NodoIdentificador)nodo;
 		int direccion;
 		if(UtGen.debug)	UtGen.emitirComentario("-> identificador");
-		direccion = tablaSimbolos.getDireccion(n.getNombre());
+		direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getNombre());
 		UtGen.emitirRM("LD", UtGen.AC, direccion, UtGen.GP, "cargar valor de identificador: "+n.getNombre());
 		if(UtGen.debug)	UtGen.emitirComentario("-> identificador");
 	}
@@ -190,10 +221,12 @@ public class Generador {
 		/* Ahora cargo/saco de la pila el valor izquierdo */
 		UtGen.emitirRM("LD", UtGen.AC1, ++desplazamientoTmp, UtGen.MP, "op: pop o cargo de la pila el valor izquierdo en AC1");
 		switch(n.getOperacion()){
+			case    or:
 			case	mas:	UtGen.emitirRO("ADD", UtGen.AC, UtGen.AC1, UtGen.AC, "op: +");		
 							break;
 			case	menos:	UtGen.emitirRO("SUB", UtGen.AC, UtGen.AC1, UtGen.AC, "op: -");
 							break;
+			case    and:
 			case	por:	UtGen.emitirRO("MUL", UtGen.AC, UtGen.AC1, UtGen.AC, "op: *");
 							break;
 			case	entre:	UtGen.emitirRO("DIV", UtGen.AC, UtGen.AC1, UtGen.AC, "op: /");
@@ -238,6 +271,18 @@ public class Generador {
 							UtGen.emitirComentario("BUG: tipo de operacion desconocida");
 		}
 		if(UtGen.debug)	UtGen.emitirComentario("<- Operacion: " + n.getOperacion());
+	}
+	private static void generarProgram(NodoBase nodo){
+		if(((NodoProgram) nodo).getFunctions()!=null){
+			generar(((NodoProgram) nodo).getFunctions());
+	}
+		if(((NodoProgram) nodo).getMain()!=null)
+			generar(((NodoProgram) nodo).getMain());
+	}
+	private static void generarFuncion(NodoBase nodo){
+			NodoFuncion n = (NodoFuncion)nodo;
+			if(n.getSent()!=null)
+				generar(n.getSent());
 	}
 	
 	//TODO: enviar preludio a archivo de salida, obtener antes su nombre

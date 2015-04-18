@@ -149,11 +149,9 @@ public class TablaSimbolos {
 	}
 
 	public int getDireccion(String ambito, String Clave ){
-		//return BuscarSimbolo(Clave).getDireccionMemoria();
-	    tablaAmbito = tabla.get(ultimoAmbito);
-	    RegistroSimbolo sim = tablaAmbito.get(Clave);
-	    return sim.getDireccionMemoria();
-		//return 1;
+	    tablaAmbito = tabla.get(ambito);
+	    RegistroSimbolo simbolo = tablaAmbito.get(Clave);
+	    return simbolo.getDireccionMemoria();
 	}
 	
 	public String getTipo(String ambito, String identificador){

@@ -37,7 +37,7 @@ public class Semantico {
 		    }
 		    else if (raiz instanceof  NodoRepeat){
 		    	recorrerArbol(((NodoRepeat)raiz).getCuerpo());
-		    	if (comprobarTipo(((NodoIf)raiz).getPrueba()) != "Boolean")
+		    	if (comprobarTipo(((NodoRepeat)raiz).getPrueba()) != "Boolean")
 		    		printError("No se puede probar la expresion en el repeat");
 		    }
 		    else if (raiz instanceof  NodoAsignacion){	    	
