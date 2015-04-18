@@ -34,7 +34,7 @@ public class Generador {
 	 */
 	private static int desplazamientoTmp = 0;
 	private static TablaSimbolos tablaSimbolos = null;
-	
+	private static String ultimoAmbito;
 	public static void setTablaSimbolos(TablaSimbolos tabla){
 		tablaSimbolos = tabla;
 	}
@@ -80,8 +80,10 @@ public class Generador {
 			generarOperacion(nodo);
 		}else if (nodo instanceof NodoDeclaracion){
 		}else if (nodo instanceof NodoProgram){
+			ultimoAmbito = "main";
 			generarProgram(nodo);
 		}else if (nodo instanceof NodoFuncion){
+			ultimoAmbito = ((NodoFuncion)nodo).getNombre();
 			generarFuncion(nodo);
 		}else{
 			System.out.println("BUG: Tipo de nodo a generar desconocido");
@@ -90,7 +92,7 @@ public class Generador {
 		if(nodo.TieneHermano())
 			generar(nodo.getHermanoDerecha());
 	}else
-		System.out.println("¡¡¡ERROR: por favor fije la tabla de simbolos a usar antes de generar codigo objeto!!!");
+		System.out.println("ï¿½ï¿½ï¿½ERROR: por favor fije la tabla de simbolos a usar antes de generar codigo objeto!!!");
 }
 
 	private static void generarIf(NodoBase nodo){
@@ -165,7 +167,7 @@ public class Generador {
 		/* Genero el codigo para la expresion a la derecha de la asignacion */
 		generar(n.getExpresion());
 		/* Ahora almaceno el valor resultante */
-		direccion = tablaSimbolos.getDireccion(n.getIdentificador());
+		direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
 		UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "asignacion: almaceno el valor para el id "+n.getIdentificador());
 		if(UtGen.debug)	UtGen.emitirComentario("<- asignacion");
 	}
@@ -175,7 +177,7 @@ public class Generador {
 		int direccion;
 		if(UtGen.debug)	UtGen.emitirComentario("-> leer");
 		UtGen.emitirRO("IN", UtGen.AC, 0, 0, "leer: lee un valor entero ");
-		direccion = tablaSimbolos.getDireccion(n.getIdentificador());
+		direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
 		UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "leer: almaceno el valor entero leido en el id "+n.getIdentificador());
 		if(UtGen.debug)	UtGen.emitirComentario("<- leer");
 	}
@@ -201,7 +203,7 @@ public class Generador {
 		NodoIdentificador n = (NodoIdentificador)nodo;
 		int direccion;
 		if(UtGen.debug)	UtGen.emitirComentario("-> identificador");
-		direccion = tablaSimbolos.getDireccion(n.getNombre());
+		direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getNombre());
 		UtGen.emitirRM("LD", UtGen.AC, direccion, UtGen.GP, "cargar valor de identificador: "+n.getNombre());
 		if(UtGen.debug)	UtGen.emitirComentario("-> identificador");
 	}
