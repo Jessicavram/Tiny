@@ -36,6 +36,7 @@ public class Generador {
 	private static int localidad_return;
 	private static TablaSimbolos tablaSimbolos = null;
 	private static String ultimoAmbito;
+	private static int saltomain;
 	public static void setTablaSimbolos(TablaSimbolos tabla){
 		tablaSimbolos = tabla;
 	}
@@ -81,13 +82,14 @@ public class Generador {
 			generarOperacion(nodo);
 		}else if (nodo instanceof NodoDeclaracion){
 		}else if (nodo instanceof NodoProgram){
-			ultimoAmbito = "main";
 			generarProgram(nodo);
 		}else if (nodo instanceof NodoFuncion){
 			ultimoAmbito = ((NodoFuncion)nodo).getNombre();
 			generarFuncion(nodo);
 		}else if(nodo instanceof NodoReturn){
 			generarReturn(nodo);
+		}else if(nodo instanceof NodoCallFuncion){
+			generarLlamado(nodo);
 		}else{
 			System.out.println("BUG: Tipo de nodo a generar desconocido");
 		}
@@ -278,8 +280,16 @@ public class Generador {
 		if(((NodoProgram) nodo).getFunctions()!=null){
 			generar(((NodoProgram) nodo).getFunctions());
 	}
-		if(((NodoProgram) nodo).getMain()!=null)
+		if(((NodoProgram) nodo).getMain()!=null){
+			ultimoAmbito = "main";
+			
+			//iniciar la ejecucion en la linea #line main
+			int pos = UtGen.emitirSalto(0);
+			UtGen.cargarRespaldo(saltomain);
+			UtGen.emitirRM("LDA", UtGen.PC, pos,UtGen.GP, "Salto incodicional al main");
+			UtGen.restaurarRespaldo();
 			generar(((NodoProgram) nodo).getMain());
+		}
 	}
 	private static void generarFuncion(NodoBase nodo){
 		//aqui debo de poner el Imen a la tabla
@@ -307,6 +317,8 @@ public class Generador {
 		UtGen.emitirComentario("Preludio estandar:");
 		UtGen.emitirRM("LD", UtGen.MP, 0, UtGen.AC, "cargar la maxima direccion desde la localidad 0");
 		UtGen.emitirRM("ST", UtGen.AC, 0, UtGen.AC, "limpio el registro de la localidad 0");
+		//iniciar la ejecucion en la linea #line main
+		saltomain = UtGen.emitirSalto(1);
 	}
 	private static void generarArgumentos(NodoBase nodo){
 		//Recupera los argumentos de derecha a izquierda
@@ -330,6 +342,22 @@ public class Generador {
 		
 		//aqui debo saltar a donde termina la funcion
 		UtGen.emitirRM_Abs("LDA", UtGen.PC, localidad_return, "jmp hacia donde quedo"); //Nueva linea
+	}
+	private static void generarLlamado(NodoBase nodo){
+		NodoCallFuncion n = (NodoCallFuncion)nodo;
+		//Subir la linea actual
+		UtGen.emitirRM("LDA", UtGen.AC, 1, UtGen.PC, "(AC=Pos actual + 1)");
+		UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el #linea a retornar");
+		//cargar las variables
+		if (n.getArgs()!=null){
+			generar(n.getArgs()); //deja es AC el valor
+			UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el argumento");
+		}
+		//cambiar de ambito
+		ultimoAmbito =((n.getNombre()));
+		//saltar a la linea donde empieza la funcion
+		int pos = tablaSimbolos.getiMem(ultimoAmbito);
+		UtGen.emitirRM("LDA", UtGen.PC, pos,UtGen.GP, "Salto incodicional a donde fue llamada la funcion");
 	}
 
 }
