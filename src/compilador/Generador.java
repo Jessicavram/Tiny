@@ -85,6 +85,8 @@ public class Generador {
 		}else if (nodo instanceof NodoFuncion){
 			ultimoAmbito = ((NodoFuncion)nodo).getNombre();
 			generarFuncion(nodo);
+		}else if(nodo instanceof NodoReturn){
+			generarReturn(nodo);
 		}else{
 			System.out.println("BUG: Tipo de nodo a generar desconocido");
 		}
@@ -279,11 +281,18 @@ public class Generador {
 			generar(((NodoProgram) nodo).getMain());
 	}
 	private static void generarFuncion(NodoBase nodo){
+		//aqui debo de poner el Imen a la tabla
+			int pos=UtGen.emitirSalto(0);
+			tablaSimbolos.setiMem(ultimoAmbito,pos );
 			NodoFuncion n = (NodoFuncion)nodo;
 			if(n.getArgs()!=null)
 				generarArgumentos(n.getArgs());
 			if(n.getSent()!=null)
 				generar(n.getSent());
+			//Bajo de la pila temporal el numero de la linea en la cual quedo
+			UtGen.emitirRM("LD", UtGen.NL, ++desplazamientoTmp, UtGen.MP, "#linea: Recupera el #de linea a saltar, lo guardo en NL");
+			//Salto incondicional a donde quede REVISAR
+			UtGen.emitirRM("LDA", UtGen.PC, UtGen.NL,UtGen.GP, "Salto incodicional a donde fue llamada la funcion");
 	}
 	
 	//TODO: enviar preludio a archivo de salida, obtener antes su nombre
@@ -297,13 +306,22 @@ public class Generador {
 		UtGen.emitirRM("ST", UtGen.AC, 0, UtGen.AC, "limpio el registro de la localidad 0");
 	}
 	private static void generarArgumentos(NodoBase nodo){
+		//Recupera los argumentos de derecha a izquierda
+		//ejem fun (int a,int b, int c)
+		//Supone que en la pila vienen de esa misma forma a,b,c por lo que el que esta de ultimo es el argumento int c
 		NodoDeclaracion n = (NodoDeclaracion)nodo;
 		int direccion;		
 		if((n.getHermanoDerecha())!= null)
 			generarArgumentos((n.getHermanoDerecha()));
-		direccion = tablaSimbolos.getDireccion(((NodoIdentificador)n.getVariable()).getNombre());
+		direccion = tablaSimbolos.getDireccion(ultimoAmbito,((NodoIdentificador)n.getVariable()).getNombre());
+		//Recuperar el valor de la pila temporal
+		UtGen.emitirRM("LD", UtGen.AC, ++desplazamientoTmp, UtGen.MP, "arg: Recuperar de la pila Temporal el valor del arguento, y lo guardo en AC");
+		//Guardar el valor recuperado en la vararible argumento
 		UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "argumento: almaceno el valor para el id "+((NodoIdentificador)n.getVariable()).getNombre());
 		
+	}
+	private static void generarReturn(NodoBase nodo){
+		generar(((NodoReturn)nodo).getExpresion());
 	}
 
 }
