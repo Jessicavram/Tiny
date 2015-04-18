@@ -148,7 +148,7 @@ public class TablaSimbolos {
 		}
 	}
 
-	public int getDireccion(String Clave){
+	public int getDireccion(String ambito, String Clave ){
 		//return BuscarSimbolo(Clave).getDireccionMemoria();
 	    tablaAmbito = tabla.get(ultimoAmbito);
 	    RegistroSimbolo sim = tablaAmbito.get(Clave);
@@ -193,7 +193,6 @@ public class TablaSimbolos {
 	
 	private void printError(Object chain){		
 		System.err.println("[Error Semantico]: "+chain);
-//		System.exit(0);
 	}	
 	
 	public void setUltimoAmbito(String Ambito)

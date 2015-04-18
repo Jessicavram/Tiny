@@ -34,7 +34,7 @@ public class Generador {
 	 */
 	private static int desplazamientoTmp = 0;
 	private static TablaSimbolos tablaSimbolos = null;
-	
+	private String ultimoAmbito;
 	public static void setTablaSimbolos(TablaSimbolos tabla){
 		tablaSimbolos = tabla;
 	}
@@ -75,6 +75,8 @@ public class Generador {
 			generarIdentificador(nodo);
 		}else if (nodo instanceof NodoOperacion){
 			generarOperacion(nodo);
+		}else if (nodo instanceof NodoDeclaracion){
+			
 		}else{
 			System.out.println("BUG: Tipo de nodo a generar desconocido");
 		}
@@ -82,7 +84,7 @@ public class Generador {
 		if(nodo.TieneHermano())
 			generar(nodo.getHermanoDerecha());
 	}else
-		System.out.println("¡¡¡ERROR: por favor fije la tabla de simbolos a usar antes de generar codigo objeto!!!");
+		System.out.println("ï¿½ï¿½ï¿½ERROR: por favor fije la tabla de simbolos a usar antes de generar codigo objeto!!!");
 }
 
 	private static void generarIf(NodoBase nodo){

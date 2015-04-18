@@ -5,11 +5,9 @@ import ast.*;
 public class Semantico {
 	
 	private TablaSimbolos tablaSimbolos;
-	private String ultimoAmbito;
-	
-	public boolean debug = true; 
-	
-
+	private String ultimoAmbito;	
+	public boolean debug = true;
+	public boolean anyError = false;
 	
 	public Semantico(TablaSimbolos tablaSimbolos) {
 		super();
@@ -25,8 +23,7 @@ public class Semantico {
 		    	// Compruebo que la variable ha sido declara en el ambito
 		    	verificarExistenciaDeVariable(((NodoIdentificador)raiz).getNombre());
 		    		
-		    }
-	
+		    }	
 		    /* Hago el recorrido recursivo */
 		    if (raiz instanceof  NodoIf){
 		    	if (comprobarTipo(((NodoIf)raiz).getPrueba()) != "Boolean")
@@ -56,15 +53,13 @@ public class Semantico {
 		    }
 		    else if (raiz instanceof  NodoEscribir)
 		    	recorrerArbol(((NodoEscribir)raiz).getExpresion());
-		    else if (raiz instanceof NodoOperacion){
-		    	
+		    else if (raiz instanceof NodoOperacion){		    	
 				NodoBase tipoIzquierdo 	= (NodoBase) ((NodoOperacion)raiz).getOpIzquierdo();
 				NodoBase tipoDerecho 	= (NodoBase) ((NodoOperacion)raiz).getOpDerecho();
 	
 				// Comprobacion de tipo en expresion
 				if( comprobarTipo(tipoDerecho) != comprobarTipo(tipoIzquierdo) )
-					printError("Tipos diferentes");
-		    	
+					printError("Tipos diferentes");		    	
 		    }
 		    else if (raiz instanceof NodoDeclaracion) {
 		    	recorrerArbol(((NodoDeclaracion)raiz).getVariable());
@@ -83,8 +78,7 @@ public class Semantico {
 		    	if (comprobarTipo(((NodoAsignacion)nodo).getExpresion()) != "Int")
 		    		printError("No se puede probar la expresion paso en la sentencia for");		    	
 		    	
-		    	recorrerArbol(((NodoFor)raiz).getCuerpo());
-		
+		    	recorrerArbol(((NodoFor)raiz).getCuerpo());		
 		    }
 		    else if (raiz instanceof NodoFuncion) {
 		    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion    	    	
@@ -93,10 +87,9 @@ public class Semantico {
 		    		printError("La funcion "+((NodoFuncion)raiz).getNombre()+" debe contener una clausula RETURN");
 		    	recorrerArbol(((NodoFuncion)raiz).getSent());
 		    } 
-		    else if (raiz instanceof NodoCallFuncion) {
-		    			    	
-	    		ArrayList arrayArgumentos = new ArrayList<String>();
-		    	String nombreFuncion = ((NodoCallFuncion)raiz).getNombre();
+		    else if (raiz instanceof NodoCallFuncion) {		    			    	
+	    		ArrayList<String> arrayArgumentos 	= new ArrayList<String>();
+		    	String nombreFuncion 				= ((NodoCallFuncion)raiz).getNombre();
 		    	if(((NodoCallFuncion)raiz).getArgs() != null){
 		    		recorrerArbol((((NodoCallFuncion)raiz).getArgs()));
 			    	recorrerArgumentos((((NodoCallFuncion)raiz).getArgs()),arrayArgumentos);
@@ -106,8 +99,7 @@ public class Semantico {
 		    	} else if (tablaSimbolos.getArrayArguments( nombreFuncion) != null ){
 		    		if(tablaSimbolos.getArrayArguments( nombreFuncion).size() != 0 )
 		    			printError("LLamada a funcion "+nombreFuncion+" invalida, faltan argumanetos, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
-		    	}
-		    	
+		    	}		    	
 		    }
 		    else if (raiz instanceof NodoProgram) {
 		    	if(((NodoProgram)raiz).getFunctions()!=null){
@@ -126,14 +118,15 @@ public class Semantico {
 	
 	private String comprobarTipo(NodoBase nodo){
 		if (nodo instanceof NodoOperacion){
-			if(((NodoOperacion)nodo).getOperacion() == tipoOp.and || ((NodoOperacion)nodo).getOperacion() == tipoOp.or){
+			if(((NodoOperacion)nodo).getOperacion() 	== tipoOp.and 
+				|| ((NodoOperacion)nodo).getOperacion() == tipoOp.or){
 				// Verificar que tipo izquierdo y derecho sean boolean				
 				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
 				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
 				if( tipoIzquierdo == tipoDerecho )
 					return tipoIzquierdo;
 				
-			}else if(((NodoOperacion)nodo).getOperacion() == tipoOp.igual
+			}else if(((NodoOperacion)nodo).getOperacion() 	== tipoOp.igual
 					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.noigual){
 				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
 				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
@@ -143,7 +136,7 @@ public class Semantico {
 					return "Boolean";
 				else 
 					return "Int";
-			} else if(((NodoOperacion)nodo).getOperacion() == tipoOp.mas 
+			} else if(((NodoOperacion)nodo).getOperacion() 	== tipoOp.mas 
 					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.menos
 					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.por
 					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.entre){ 
@@ -164,13 +157,9 @@ public class Semantico {
 			}
 		}
 		else if(nodo instanceof NodoCallFuncion){
-			// Falta que callfuncion tenga tipo y redevolverlo
-			return tablaSimbolos.getTipoFuncion( ((NodoCallFuncion)nodo).getNombre() ) ;
-	    			
-		}
-		
-		else if(nodo instanceof NodoIdentificador){
-			
+			return tablaSimbolos.getTipoFuncion( ((NodoCallFuncion)nodo).getNombre() ) ;	    			
+		}		
+		else if(nodo instanceof NodoIdentificador){			
 		    String identificador = ((NodoIdentificador)nodo).getNombre();
 		    if( verificarExistenciaDeVariable(identificador)){
 				String tipoIdentificador = tablaSimbolos.getTipo(ultimoAmbito, identificador);
@@ -178,21 +167,11 @@ public class Semantico {
 		    }
 		}
 		else if(nodo instanceof NodoValor){	
-
-			// falta mejorar
-			String tipoValor="Int";
-			Integer tipo;
-			tipo= ((NodoValor)nodo).getTipo();
-			//((NodoValor)nodo).getValor() ;
-			if(tipo==0){
-				tipoValor="Int";
-			}
-			
-			if(tipo==1){
-				tipoValor="Boolean";	
-			}
-			return tipoValor;
-
+			Integer tipo= ((NodoValor)nodo).getTipo();
+			if(tipo==0)
+				return "Int";			
+			if(tipo==1)
+				return "Boolean";	
 		}
 		
 		return "";
@@ -207,7 +186,7 @@ public class Semantico {
     	}
 	}
 	
-	private void recorrerArgumentos(NodoBase nodo, ArrayList arrayArgumentos ){
+	private void recorrerArgumentos(NodoBase nodo, ArrayList<String> arrayArgumentos ){
 		if (nodo instanceof NodoIdentificador){
 			// Buscar que la variable exista y sea del tipo correcto
 			String identificador = ((NodoIdentificador)nodo).getNombre();
@@ -233,23 +212,17 @@ public class Semantico {
 				printError("Tipos diferentes");
 			}
 		} else if (nodo instanceof NodoValor){
-			// agregar el tipo
-			// TODO: FALTA IMPLEMENTAR
-			//arrayArgumentos.add()
+			Integer tipo = ((NodoValor)nodo).getTipo(); 
+			if (tipo == 0)
+				arrayArgumentos.add("Int");
+			else if (tipo == 1)
+				arrayArgumentos.add("Boolean");
 		}
 		
 		if ( ((NodoBase)nodo).getHermanoDerecha() != null)
 				recorrerArgumentos(((NodoBase)nodo).getHermanoDerecha(),arrayArgumentos);
 		
 	}
-	
-	private void print(Object chain){
-		System.out.println(chain);
-	}
-	private void printError(Object chain){		
-		System.err.println("[Error Semantico]: "+chain);
-//		System.exit(0);
-	}	
 	private boolean recorrerFuncion(NodoBase raiz,String Tipo,String nombre){
 		boolean ban=false;
 		while (raiz != null) {
@@ -261,6 +234,13 @@ public class Semantico {
 			raiz = raiz.getHermanoDerecha();
 		}
 		return ban;
-	}
+	}	
+//	private void print(Object chain){
+//		System.out.println(chain);
+//	}
+	private void printError(Object chain){		
+		System.err.println("[Error Semantico]: "+chain);
+		this.anyError = true;
+	}	
 }
 

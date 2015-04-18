@@ -34,9 +34,9 @@ public class Compilador {
 		Semantico semantico = new Semantico(tablaSimbolos);
 		semantico.recorrerArbol(root);
 	    //REALIZAR ACA ANALISIS SEMANTICO
-		Generador.setTablaSimbolos(tablaSimbolos);
-		tablaSimbolos.setUltimoAmbito("main");
-		Generador.generarCodigoObjeto(((NodoProgram)root).getMain());
+//		Generador.setTablaSimbolos(tablaSimbolos);
+//		tablaSimbolos.setUltimoAmbito("main");
+//		Generador.generarCodigoObjeto(((NodoProgram)root).getMain());
 	}
 
 }
