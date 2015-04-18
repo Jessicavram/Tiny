@@ -149,8 +149,11 @@ public class TablaSimbolos {
 	}
 
 	public int getDireccion(String Clave){
-//		return BuscarSimbolo(Clave).getDireccionMemoria();
-		return 1;
+		//return BuscarSimbolo(Clave).getDireccionMemoria();
+	    tablaAmbito = tabla.get(ultimoAmbito);
+	    RegistroSimbolo sim = tablaAmbito.get(Clave);
+	    return sim.getDireccionMemoria();
+		//return 1;
 	}
 	
 	public String getTipo(String ambito, String identificador){
@@ -192,6 +195,11 @@ public class TablaSimbolos {
 		System.err.println("[Error Semantico]: "+chain);
 //		System.exit(0);
 	}	
+	
+	public void setUltimoAmbito(String Ambito)
+	{
+		ultimoAmbito = Ambito;
+	}
 	/*
 	 * TODO:
 	 * 1. Crear lista con las lineas de codigo donde la variable es usada.

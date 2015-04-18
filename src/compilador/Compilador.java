@@ -19,7 +19,7 @@ public class Compilador {
 			parser_obj=new parser(new Scanner(System.in,sf),sf);
 		else 
 			parser_obj=new parser(new Scanner(new java.io.FileInputStream(args[0]),sf),sf);
-		UtGen.debug=true; //NO muestro mensajes de depuracion del generador (UTGen) para que el codigo sea compatible con la version visual de la TM
+		UtGen.debug=false; //NO muestro mensajes de depuracion del generador (UTGen) para que el codigo sea compatible con la version visual de la TM
 		//Para ver depuracion de analisis sintactico se debe ir al parser.java y colocar modoDepuracion en true
 		parser_obj.parse();
 		NodoBase root=parser_obj.action_obj.getASTroot();
@@ -34,8 +34,9 @@ public class Compilador {
 		Semantico semantico = new Semantico(tablaSimbolos);
 		semantico.recorrerArbol(root);
 	    //REALIZAR ACA ANALISIS SEMANTICO
-//		Generador.setTablaSimbolos(tablaSimbolos);
-//		Generador.generarCodigoObjeto(root);
+		Generador.setTablaSimbolos(tablaSimbolos);
+		tablaSimbolos.setUltimoAmbito("main");
+		Generador.generarCodigoObjeto(((NodoProgram)root).getMain());
 	}
 
 }
