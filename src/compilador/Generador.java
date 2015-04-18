@@ -33,6 +33,7 @@ public class Generador {
 	 * y extraccion de esta pila
 	 */
 	private static int desplazamientoTmp = 0;
+	private static int localidad_return;
 	private static TablaSimbolos tablaSimbolos = null;
 	private static String ultimoAmbito;
 	public static void setTablaSimbolos(TablaSimbolos tabla){
@@ -290,6 +291,7 @@ public class Generador {
 			if(n.getSent()!=null)
 				generar(n.getSent());
 			//El return debe saltar a esta linea de codigo
+			localidad_return=UtGen.emitirSalto(0); //Nueva Linea 
 			//Bajo de la pila temporal el numero de la linea en la cual quedo
 			UtGen.emitirRM("LD", UtGen.NL, ++desplazamientoTmp, UtGen.MP, "#linea: Recupera el #de linea a saltar, lo guardo en NL");
 			//Salto incondicional a donde quede REVISAR
@@ -325,7 +327,9 @@ public class Generador {
 		generar(((NodoReturn)nodo).getExpresion());
 		//guardar en AC el valor retornado
 		UtGen.emitirRM("LD", UtGen.AC, ++desplazamientoTmp, UtGen.MP, "ret: Recuperar de la pila Temporal el valor a retornar, y lo guardo en AC");
+		
 		//aqui debo saltar a donde termina la funcion
+		UtGen.emitirRM_Abs("LDA", UtGen.PC, localidad_return, "jmp hacia donde quedo"); //Nueva linea
 	}
 
 }
