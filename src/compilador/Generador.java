@@ -79,7 +79,6 @@ public class Generador {
 		}else if (nodo instanceof NodoOperacion){
 			generarOperacion(nodo);
 		}else if (nodo instanceof NodoDeclaracion){
-			generar(nodo.getHermanoDerecha());
 		}else if (nodo instanceof NodoProgram){
 			generarProgram(nodo);
 		}else if (nodo instanceof NodoFuncion){
@@ -279,6 +278,8 @@ public class Generador {
 	}
 	private static void generarFuncion(NodoBase nodo){
 			NodoFuncion n = (NodoFuncion)nodo;
+			if(n.getArgs()!=null)
+				generarArgumentos(n.getArgs());
 			if(n.getSent()!=null)
 				generar(n.getSent());
 	}
@@ -292,6 +293,15 @@ public class Generador {
 		UtGen.emitirComentario("Preludio estandar:");
 		UtGen.emitirRM("LD", UtGen.MP, 0, UtGen.AC, "cargar la maxima direccion desde la localidad 0");
 		UtGen.emitirRM("ST", UtGen.AC, 0, UtGen.AC, "limpio el registro de la localidad 0");
+	}
+	private static void generarArgumentos(NodoBase nodo){
+		NodoDeclaracion n = (NodoDeclaracion)nodo;
+		int direccion;		
+		if((n.getHermanoDerecha())!= null)
+			generarArgumentos((n.getHermanoDerecha()));
+		direccion = tablaSimbolos.getDireccion(((NodoIdentificador)n.getVariable()).getNombre());
+		UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "argumento: almaceno el valor para el id "+((NodoIdentificador)n.getVariable()).getNombre());
+		
 	}
 
 }
