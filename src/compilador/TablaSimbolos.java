@@ -7,7 +7,7 @@ import ast.*;
 
 public class TablaSimbolos {
 	private HashMap <String,String> tablaFunciones;
-	private HashMap <String, Integer> tablaiMen;
+	private HashMap <String, Integer> tablaiMem;
 	public ArrayList<String> arrayArgumentos;
 	private HashMap <String,ArrayList<String>> tablaConArgumentos;
 	private HashMap<String, HashMap<String, RegistroSimbolo>> tabla;
@@ -20,6 +20,7 @@ public class TablaSimbolos {
 		tabla = new HashMap<String, HashMap<String, RegistroSimbolo>>();
 		tablaFunciones = new HashMap<String, String>();
 		tablaConArgumentos = new HashMap<String, ArrayList<String>>();
+		tablaiMem = new HashMap <String, Integer>();
 		direccion=0;
 	}
 
@@ -200,11 +201,11 @@ public class TablaSimbolos {
 	}
 	
 	public void setiMem(String ambito, Integer linea){
-		tablaiMen.put(ambito, linea);
+		tablaiMem.put(ambito, linea);
 	}
 	
 	public Integer getiMem(String ambito){
-		return tablaiMen.get(ambito);
+		return tablaiMem.get(ambito);
 	}
 	/*
 	 * TODO:
