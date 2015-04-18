@@ -203,7 +203,7 @@ public class TablaSimbolos {
 		tablaiMen.put(ambito, linea);
 	}
 	
-	public Integer getiMem(String ambito, Integer linea){
+	public Integer getiMem(String ambito){
 		return tablaiMen.get(ambito);
 	}
 	/*
