@@ -80,13 +80,14 @@ public class Generador {
 			generarOperacion(nodo);
 		}else if (nodo instanceof NodoDeclaracion){
 		}else if (nodo instanceof NodoProgram){
-			ultimoAmbito = "main";
 			generarProgram(nodo);
 		}else if (nodo instanceof NodoFuncion){
 			ultimoAmbito = ((NodoFuncion)nodo).getNombre();
 			generarFuncion(nodo);
 		}else if(nodo instanceof NodoReturn){
 			generarReturn(nodo);
+		}else if(nodo instanceof NodoCallFuncion){
+			generarLlamado(nodo);
 		}else{
 			System.out.println("BUG: Tipo de nodo a generar desconocido");
 		}
@@ -277,8 +278,10 @@ public class Generador {
 		if(((NodoProgram) nodo).getFunctions()!=null){
 			generar(((NodoProgram) nodo).getFunctions());
 	}
-		if(((NodoProgram) nodo).getMain()!=null)
+		if(((NodoProgram) nodo).getMain()!=null){
+			ultimoAmbito = "main";
 			generar(((NodoProgram) nodo).getMain());
+		}
 	}
 	private static void generarFuncion(NodoBase nodo){
 		//aqui debo de poner el Imen a la tabla
@@ -326,6 +329,22 @@ public class Generador {
 		//guardar en AC el valor retornado
 		UtGen.emitirRM("LD", UtGen.AC, ++desplazamientoTmp, UtGen.MP, "ret: Recuperar de la pila Temporal el valor a retornar, y lo guardo en AC");
 		//aqui debo saltar a donde termina la funcion
+	}
+	private static void generarLlamado(NodoBase nodo){
+		NodoCallFuncion n = (NodoCallFuncion)nodo;
+		//Subir la linea actual
+		UtGen.emitirRM("LDA", UtGen.AC, 1, UtGen.PC, "(AC=Pos actual + 1)");
+		UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el #linea a retornar");
+		//cargar las variables
+		if (n.getArgs()!=null){
+			generar(n.getArgs()); //deja es AC el valor
+			UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el argumento");
+		}
+		//cambiar de ambito
+		ultimoAmbito =((n.getNombre()));
+		//saltar a la linea donde empieza la funcion
+		int pos = tablaSimbolos.getiMem(ultimoAmbito);
+		UtGen.emitirRM("LDA", UtGen.PC, pos,UtGen.GP, "Salto incodicional a donde fue llamada la funcion");
 	}
 
 }
