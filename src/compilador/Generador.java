@@ -289,6 +289,7 @@ public class Generador {
 				generarArgumentos(n.getArgs());
 			if(n.getSent()!=null)
 				generar(n.getSent());
+			//El return debe saltar a esta linea de codigo
 			//Bajo de la pila temporal el numero de la linea en la cual quedo
 			UtGen.emitirRM("LD", UtGen.NL, ++desplazamientoTmp, UtGen.MP, "#linea: Recupera el #de linea a saltar, lo guardo en NL");
 			//Salto incondicional a donde quede REVISAR
@@ -322,6 +323,9 @@ public class Generador {
 	}
 	private static void generarReturn(NodoBase nodo){
 		generar(((NodoReturn)nodo).getExpresion());
+		//guardar en AC el valor retornado
+		UtGen.emitirRM("LD", UtGen.AC, ++desplazamientoTmp, UtGen.MP, "ret: Recuperar de la pila Temporal el valor a retornar, y lo guardo en AC");
+		//aqui debo saltar a donde termina la funcion
 	}
 
 }
