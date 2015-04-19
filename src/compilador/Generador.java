@@ -35,6 +35,7 @@ public class Generador {
 	private static int desplazamientoTmp = 0;
 	private static TablaSimbolos tablaSimbolos = null;
 	private static String ultimoAmbito;
+	private static int saltomain;
 	public static void setTablaSimbolos(TablaSimbolos tabla){
 		tablaSimbolos = tabla;
 	}
@@ -280,6 +281,12 @@ public class Generador {
 	}
 		if(((NodoProgram) nodo).getMain()!=null){
 			ultimoAmbito = "main";
+			
+			//iniciar la ejecucion en la linea #line main
+			int pos = UtGen.emitirSalto(0);
+			UtGen.cargarRespaldo(saltomain);
+			UtGen.emitirRM("LDA", UtGen.PC, pos,UtGen.GP, "Salto incodicional al main");
+			UtGen.restaurarRespaldo();
 			generar(((NodoProgram) nodo).getMain());
 		}
 	}
@@ -308,6 +315,8 @@ public class Generador {
 		UtGen.emitirComentario("Preludio estandar:");
 		UtGen.emitirRM("LD", UtGen.MP, 0, UtGen.AC, "cargar la maxima direccion desde la localidad 0");
 		UtGen.emitirRM("ST", UtGen.AC, 0, UtGen.AC, "limpio el registro de la localidad 0");
+		//iniciar la ejecucion en la linea #line main
+		saltomain = UtGen.emitirSalto(1);
 	}
 	private static void generarArgumentos(NodoBase nodo){
 		//Recupera los argumentos de derecha a izquierda
