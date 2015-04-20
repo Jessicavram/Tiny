@@ -33,6 +33,7 @@ public class Generador {
 	 * y extraccion de esta pila
 	 */
 	private static int desplazamientoTmp = 0;
+	private static int localidad_return;
 	private static TablaSimbolos tablaSimbolos = null;
 	private static String ultimoAmbito;
 	private static int saltomain;
@@ -168,11 +169,25 @@ public class Generador {
 		NodoAsignacion n = (NodoAsignacion)nodo;
 		int direccion;
 		if(UtGen.debug)	UtGen.emitirComentario("-> asignacion");		
-		/* Genero el codigo para la expresion a la derecha de la asignacion */
-		generar(n.getExpresion());
-		/* Ahora almaceno el valor resultante */
-		direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
-		UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "asignacion: almaceno el valor para el id "+n.getIdentificador());
+		if(n.getPosicion() == null)
+		{
+			/* Genero el codigo para la expresion a la derecha de la asignacion */
+			generar(n.getExpresion());
+			/* Ahora almaceno el valor resultante */
+			direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
+			UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "asignacion: almaceno el valor para el id "+n.getIdentificador());
+		}
+		else
+		{
+			generar(n.getPosicion());
+			UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "op: push en la pila tmp el resultado del desplazamiento");
+			generar(n.getExpresion());
+			direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
+			UtGen.emitirRM("LD", UtGen.GP, ++desplazamientoTmp, UtGen.MP, "op: push en la pila tmp el resultado del desplazamiento");
+			UtGen.emitirRM("ST", UtGen.AC, direccion,UtGen.GP, "asignacion: almaceno el valor para el id "+n.getIdentificador());
+			UtGen.emitirRM("LDC",UtGen.GP,0,0,"cargo constante 0 en registro DESP");
+		}
+		
 		if(UtGen.debug)	UtGen.emitirComentario("<- asignacion");
 	}
 	
@@ -180,9 +195,21 @@ public class Generador {
 		NodoLeer n = (NodoLeer)nodo;
 		int direccion;
 		if(UtGen.debug)	UtGen.emitirComentario("-> leer");
-		UtGen.emitirRO("IN", UtGen.AC, 0, 0, "leer: lee un valor entero ");
-		direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
-		UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "leer: almaceno el valor entero leido en el id "+n.getIdentificador());
+		if(n.getPosicion() == null)
+		{
+			UtGen.emitirRO("IN", UtGen.AC, 0, 0, "leer: lee un valor entero ");
+			direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
+			UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "leer: almaceno el valor entero leido en el id "+n.getIdentificador());
+		}
+		else
+		{
+			generar(n.getPosicion());
+			UtGen.emitirRO("ADD",UtGen.GP,UtGen.GP,UtGen.AC,"sumo despazamiento al registro GP");
+			UtGen.emitirRO("IN", UtGen.AC, 0, 0, "leer: lee un valor entero ");
+			direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
+			UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "leer: almaceno el valor entero leido en el id "+n.getIdentificador());
+			UtGen.emitirRM("LDC",UtGen.GP,0,0,"cargo constante 0 en registro GP");
+		}
 		if(UtGen.debug)	UtGen.emitirComentario("<- leer");
 	}
 	
@@ -208,7 +235,17 @@ public class Generador {
 		int direccion;
 		if(UtGen.debug)	UtGen.emitirComentario("-> identificador");
 		direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getNombre());
+		
+		if(n.getExpresion()!=null)
+		{
+			generar(n.getExpresion());
+			UtGen.emitirRO("ADD",UtGen.GP,UtGen.GP,UtGen.AC,"sumo despazamiendo al registro GP");
+			UtGen.emitirRM("LD", UtGen.AC, direccion,UtGen.GP, "cargar valor de identificador: "+n.getNombre());
+			UtGen.emitirRM("LDC",UtGen.GP,0,0,"cargo constante 0 en el resgitro GP");
+		}
+		else
 		UtGen.emitirRM("LD", UtGen.AC, direccion, UtGen.GP, "cargar valor de identificador: "+n.getNombre());
+
 		if(UtGen.debug)	UtGen.emitirComentario("-> identificador");
 	}
 
@@ -301,6 +338,7 @@ public class Generador {
 			if(n.getSent()!=null)
 				generar(n.getSent());
 			//El return debe saltar a esta linea de codigo
+			localidad_return=UtGen.emitirSalto(0); //Nueva Linea 
 			//Bajo de la pila temporal el numero de la linea en la cual quedo
 			UtGen.emitirRM("LD", UtGen.NL, ++desplazamientoTmp, UtGen.MP, "#linea: Recupera el #de linea a saltar, lo guardo en NL");
 			//Salto incondicional a donde quede REVISAR
@@ -324,7 +362,8 @@ public class Generador {
 	private static void generarArgumentos(NodoBase nodo){
 		//Recupera los argumentos de derecha a izquierda
 		//ejem fun (int a,int b, int c)
-		//Supone que en la pila vienen de esa misma forma a,b,c por lo que el que esta de ultimo es el argumento int c
+		//Supone que en la pila vienen de es
+		//a misma forma a,b,c por lo que el que esta de ultimo es el argumento int c
 		NodoDeclaracion n = (NodoDeclaracion)nodo;
 		int direccion;		
 		if((n.getHermanoDerecha())!= null)
@@ -340,7 +379,9 @@ public class Generador {
 		generar(((NodoReturn)nodo).getExpresion());
 		//guardar en AC el valor retornado
 		UtGen.emitirRM("LD", UtGen.AC, ++desplazamientoTmp, UtGen.MP, "ret: Recuperar de la pila Temporal el valor a retornar, y lo guardo en AC");
+		
 		//aqui debo saltar a donde termina la funcion
+		UtGen.emitirRM_Abs("LDA", UtGen.PC, localidad_return, "jmp hacia donde quedo"); //Nueva linea
 	}
 	private static void generarLlamado(NodoBase nodo){
 		//Subir la linea actual
