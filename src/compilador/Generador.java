@@ -295,6 +295,7 @@ public class Generador {
 			int pos=UtGen.emitirSalto(0);
 			tablaSimbolos.setiMem(ultimoAmbito,pos );
 			NodoFuncion n = (NodoFuncion)nodo;
+			/*
 			if(n.getArgs()!=null)
 				generarArgumentos(n.getArgs());
 			if(n.getSent()!=null)
@@ -304,6 +305,7 @@ public class Generador {
 			UtGen.emitirRM("LD", UtGen.NL, ++desplazamientoTmp, UtGen.MP, "#linea: Recupera el #de linea a saltar, lo guardo en NL");
 			//Salto incondicional a donde quede REVISAR
 			UtGen.emitirRM("LDA", UtGen.PC, UtGen.NL,UtGen.GP, "Salto incodicional a donde fue llamada la funcion");
+			*/
 	}
 	
 	//TODO: enviar preludio a archivo de salida, obtener antes su nombre
@@ -315,6 +317,7 @@ public class Generador {
 		UtGen.emitirComentario("Preludio estandar:");
 		UtGen.emitirRM("LD", UtGen.MP, 0, UtGen.AC, "cargar la maxima direccion desde la localidad 0");
 		UtGen.emitirRM("ST", UtGen.AC, 0, UtGen.AC, "limpio el registro de la localidad 0");
+		//UtGen.emitirRM("LDC",UtGen.MP, 1023,UtGen.AC,"Colocar tope de la meoria");
 		//iniciar la ejecucion en la linea #line main
 		saltomain = UtGen.emitirSalto(1);
 	}
@@ -340,14 +343,19 @@ public class Generador {
 		//aqui debo saltar a donde termina la funcion
 	}
 	private static void generarLlamado(NodoBase nodo){
-		NodoCallFuncion n = (NodoCallFuncion)nodo;
 		//Subir la linea actual
 		UtGen.emitirRM("LDA", UtGen.AC, 1, UtGen.PC, "(AC=Pos actual + 1)");
 		UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el #linea a retornar");
 		//cargar las variables
-		if (n.getArgs()!=null){
-			generar(n.getArgs()); //deja es AC el valor
-			UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el argumento");
+		NodoCallFuncion n = (NodoCallFuncion)nodo;		
+		if (n.getArgs()!=null){	
+			NodoBase aux = n.getArgs();
+			do{				
+				//Falta hacer que solo genere el argumento actual y no continue con los hermanos
+				generar(aux); //deja es AC el valor
+				UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el argumento");	
+				aux=aux.getHermanoDerecha();
+			}while(aux!=null);
 		}
 		//cambiar de ambito
 		ultimoAmbito =((n.getNombre()));
