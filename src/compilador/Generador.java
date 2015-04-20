@@ -48,7 +48,7 @@ public class Generador {
 		System.out.println();
 		System.out.println();
 		generarPreludioEstandar();
-		generar(raiz);
+		generar(raiz,true);
 		/*Genero el codigo de finalizacion de ejecucion del codigo*/   
 		UtGen.emitirComentario("Fin de la ejecucion.");
 		UtGen.emitirRO("HALT", 0, 0, 0, "");
@@ -59,7 +59,7 @@ public class Generador {
 	
 	//Funcion principal de generacion de codigo
 	//prerequisito: Fijar la tabla de simbolos antes de generar el codigo objeto 
-	private static void generar(NodoBase nodo){
+	private static void generar(NodoBase nodo , boolean ban ){  //bandera para generar el hermano derecho Verdadero-->Generar herman derecho
 	if(tablaSimbolos!=null){
 		
 		if (nodo instanceof  NodoIf){
@@ -94,8 +94,8 @@ public class Generador {
 			System.out.println("BUG: Tipo de nodo a generar desconocido");
 		}
 		/*Si el hijo de extrema izquierda tiene hermano a la derecha lo genero tambien*/
-		if(nodo.TieneHermano())
-			generar(nodo.getHermanoDerecha());
+		if(ban && nodo.TieneHermano())
+			generar(nodo.getHermanoDerecha(),true);
 	}else
 		System.out.println("���ERROR: por favor fije la tabla de simbolos a usar antes de generar codigo objeto!!!");
 }
@@ -105,11 +105,11 @@ public class Generador {
 		int localidadSaltoElse,localidadSaltoEnd,localidadActual;
 		if(UtGen.debug)	UtGen.emitirComentario("-> if");
 		/*Genero el codigo para la parte de prueba del IF*/
-		generar(n.getPrueba());
+		generar(n.getPrueba(),true);
 		localidadSaltoElse = UtGen.emitirSalto(1);
 		UtGen.emitirComentario("If: el salto hacia el else debe estar aqui");
 		/*Genero la parte THEN*/
-		generar(n.getParteThen());
+		generar(n.getParteThen(),true);
 		localidadSaltoEnd = UtGen.emitirSalto(1);
 		UtGen.emitirComentario("If: el salto hacia el final debe estar aqui");
 		localidadActual = UtGen.emitirSalto(0);
@@ -118,7 +118,7 @@ public class Generador {
 		UtGen.restaurarRespaldo();
 		/*Genero la parte ELSE*/
 		if(n.getParteElse()!=null){
-			generar(n.getParteElse());
+			generar(n.getParteElse(),true);
     	}
 		//igualmente debo generar la sentencia que reserve en
 		//localidadSaltoEnd al finalizar la ejecucion de un true
@@ -136,9 +136,9 @@ public class Generador {
 			localidadSaltoInicio = UtGen.emitirSalto(0);
 			UtGen.emitirComentario("repeat: el salto hacia el final (luego del cuerpo) del repeat debe estar aqui");
 			/* Genero el cuerpo del repeat */
-			generar(n.getCuerpo());
+			generar(n.getCuerpo(),true);
 			/* Genero el codigo de la prueba del repeat */
-			generar(n.getPrueba());
+			generar(n.getPrueba(),true);
 			UtGen.emitirRM_Abs("JEQ", UtGen.AC, localidadSaltoInicio, "repeat: jmp hacia el inicio del cuerpo");
 		if(UtGen.debug)	UtGen.emitirComentario("<- repeat");
 	}		
@@ -148,15 +148,15 @@ public class Generador {
 		int localidadSaltoEnd;
 		int localidadActual;
 		if(UtGen.debug)	UtGen.emitirComentario("-> For");
-			generar(n.getAsignacion());
+			generar(n.getAsignacion(),true);
 			localidadSaltoInicio = UtGen.emitirSalto(0);
 			UtGen.emitirComentario("for: el salto hacia el final (luego del cuerpo) del for debe estar aqui");
 			/* Genero el cuerpo del for */
-			generar(n.getPrueba());
+			generar(n.getPrueba(),true);
 			localidadSaltoEnd = UtGen.emitirSalto(1);
-			generar(n.getCuerpo());
+			generar(n.getCuerpo(),true);
 			/* Genero el codigo de la prueba del repeat */
-		    generar(n.getPaso());
+		    generar(n.getPaso(),true);
 		    UtGen.emitirRM_Abs("LDA", UtGen.PC, localidadSaltoInicio, "if: jmp hacia el inicio");
 		    localidadActual = UtGen.emitirSalto(0);
 		    UtGen.cargarRespaldo(localidadSaltoEnd);
@@ -172,16 +172,16 @@ public class Generador {
 		if(n.getPosicion() == null)
 		{
 			/* Genero el codigo para la expresion a la derecha de la asignacion */
-			generar(n.getExpresion());
+			generar(n.getExpresion(),true);
 			/* Ahora almaceno el valor resultante */
 			direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
 			UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "asignacion: almaceno el valor para el id "+n.getIdentificador());
 		}
 		else
 		{
-			generar(n.getPosicion());
+			generar(n.getPosicion(),true);
 			UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "op: push en la pila tmp el resultado del desplazamiento");
-			generar(n.getExpresion());
+			generar(n.getExpresion(),true);
 			direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
 			UtGen.emitirRM("LD", UtGen.GP, ++desplazamientoTmp, UtGen.MP, "op: push en la pila tmp el resultado del desplazamiento");
 			UtGen.emitirRM("ST", UtGen.AC, direccion,UtGen.GP, "asignacion: almaceno el valor para el id "+n.getIdentificador());
@@ -203,7 +203,7 @@ public class Generador {
 		}
 		else
 		{
-			generar(n.getPosicion());
+			generar(n.getPosicion(),true);
 			UtGen.emitirRO("ADD",UtGen.GP,UtGen.GP,UtGen.AC,"sumo despazamiento al registro GP");
 			UtGen.emitirRO("IN", UtGen.AC, 0, 0, "leer: lee un valor entero ");
 			direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
@@ -217,7 +217,7 @@ public class Generador {
 		NodoEscribir n = (NodoEscribir)nodo;
 		if(UtGen.debug)	UtGen.emitirComentario("-> escribir");
 		/* Genero el codigo de la expresion que va a ser escrita en pantalla */
-		generar(n.getExpresion());
+		generar(n.getExpresion(),true);
 		/* Ahora genero la salida */
 		UtGen.emitirRO("OUT", UtGen.AC, 0, 0, "escribir: genero la salida de la expresion");
 		if(UtGen.debug)	UtGen.emitirComentario("<- escribir");
@@ -238,7 +238,7 @@ public class Generador {
 		
 		if(n.getExpresion()!=null)
 		{
-			generar(n.getExpresion());
+			generar(n.getExpresion(),true);
 			UtGen.emitirRO("ADD",UtGen.GP,UtGen.GP,UtGen.AC,"sumo despazamiendo al registro GP");
 			UtGen.emitirRM("LD", UtGen.AC, direccion,UtGen.GP, "cargar valor de identificador: "+n.getNombre());
 			UtGen.emitirRM("LDC",UtGen.GP,0,0,"cargo constante 0 en el resgitro GP");
@@ -253,11 +253,11 @@ public class Generador {
 		NodoOperacion n = (NodoOperacion) nodo;
 		if(UtGen.debug)	UtGen.emitirComentario("-> Operacion: " + n.getOperacion());
 		
-		generar(n.getOpIzquierdo());
+		generar(n.getOpIzquierdo(),true);
 		/* Almaceno en la pseudo pila de valor temporales el valor de la operacion izquierda */
 		UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "op: push en la pila tmp el resultado expresion izquierda");
 		/* Genero la expresion derecha de la operacion */
-		generar(n.getOpDerecho());
+		generar(n.getOpDerecho(),true);
 		/* Ahora cargo/saco de la pila el valor izquierdo */
 		UtGen.emitirRM("LD", UtGen.AC1, ++desplazamientoTmp, UtGen.MP, "op: pop o cargo de la pila el valor izquierdo en AC1");
 		switch(n.getOperacion()){
@@ -314,7 +314,7 @@ public class Generador {
 	}
 	private static void generarProgram(NodoBase nodo){
 		if(((NodoProgram) nodo).getFunctions()!=null){
-			generar(((NodoProgram) nodo).getFunctions());
+			generar(((NodoProgram) nodo).getFunctions(),true);
 	}
 		if(((NodoProgram) nodo).getMain()!=null){
 			ultimoAmbito = "main";
@@ -324,7 +324,7 @@ public class Generador {
 			UtGen.cargarRespaldo(saltomain);
 			UtGen.emitirRM("LDA", UtGen.PC, pos,UtGen.GP, "Salto incodicional al main");
 			UtGen.restaurarRespaldo();
-			generar(((NodoProgram) nodo).getMain());
+			generar(((NodoProgram) nodo).getMain(),true);
 		}
 	}
 	private static void generarFuncion(NodoBase nodo){
@@ -376,7 +376,7 @@ public class Generador {
 		
 	}
 	private static void generarReturn(NodoBase nodo){
-		generar(((NodoReturn)nodo).getExpresion());
+		generar(((NodoReturn)nodo).getExpresion(),true);
 		//guardar en AC el valor retornado
 		UtGen.emitirRM("LD", UtGen.AC, ++desplazamientoTmp, UtGen.MP, "ret: Recuperar de la pila Temporal el valor a retornar, y lo guardo en AC");
 		
@@ -391,9 +391,8 @@ public class Generador {
 		NodoCallFuncion n = (NodoCallFuncion)nodo;		
 		if (n.getArgs()!=null){	
 			NodoBase aux = n.getArgs();
-			do{				
-				//Falta hacer que solo genere el argumento actual y no continue con los hermanos
-				generar(aux); //deja es AC el valor
+			do{			
+				generar(aux,false); //deja es AC el valor
 				UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el argumento");	
 				aux=aux.getHermanoDerecha();
 			}while(aux!=null);
