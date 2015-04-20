@@ -18,11 +18,9 @@ public class Semantico {
 	public void recorrerArbol(NodoBase raiz){		
 		
 		while (raiz != null) {
-		    if (raiz instanceof NodoIdentificador){
-	 	    	
+		    if (raiz instanceof NodoIdentificador){	 	    	
 		    	// Compruebo que la variable ha sido declara en el ambito
-		    	verificarExistenciaDeVariable(((NodoIdentificador)raiz).getNombre());
-		    		
+		    	verificarExistenciaDeVariable(((NodoIdentificador)raiz).getNombre());		    		
 		    }	
 		    /* Hago el recorrido recursivo */
 		    if (raiz instanceof  NodoIf){
@@ -87,19 +85,25 @@ public class Semantico {
 		    		printError("La funcion "+((NodoFuncion)raiz).getNombre()+" debe contener una clausula RETURN");
 		    	recorrerArbol(((NodoFuncion)raiz).getSent());
 		    } 
-		    else if (raiz instanceof NodoCallFuncion) {		    			    	
+		    else if (raiz instanceof NodoCallFuncion) {	
+		    	
 	    		ArrayList<String> arrayArgumentos 	= new ArrayList<String>();
 		    	String nombreFuncion 				= ((NodoCallFuncion)raiz).getNombre();
-		    	if(((NodoCallFuncion)raiz).getArgs() != null){
-		    		recorrerArbol((((NodoCallFuncion)raiz).getArgs()));
-			    	recorrerArgumentos((((NodoCallFuncion)raiz).getArgs()),arrayArgumentos);
-			    	if (!tablaSimbolos.getArrayArguments( nombreFuncion).equals(arrayArgumentos) ){ 
-			    		printError("Llamada a funcion "+nombreFuncion+" invalida, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
-			    	}		    		
-		    	} else if (tablaSimbolos.getArrayArguments( nombreFuncion) != null ){
-		    		if(tablaSimbolos.getArrayArguments( nombreFuncion).size() != 0 )
-		    			printError("LLamada a funcion "+nombreFuncion+" invalida, faltan argumanetos, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
-		    	}		    	
+		    	if(!tablaSimbolos.buscarAmbito(nombreFuncion)){
+			    	if(((NodoCallFuncion)raiz).getArgs() != null){
+			    		recorrerArbol((((NodoCallFuncion)raiz).getArgs()));
+				    	recorrerArgumentos((((NodoCallFuncion)raiz).getArgs()),arrayArgumentos);
+				    	if (!tablaSimbolos.getArrayArguments( nombreFuncion).equals(arrayArgumentos) ){ 
+				    		printError("Llamada a funcion "+nombreFuncion+" invalida, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
+				    	}		    		
+			    	} else if (tablaSimbolos.getArrayArguments( nombreFuncion) != null ){
+			    		if(tablaSimbolos.getArrayArguments( nombreFuncion).size() != 0 )
+			    			printError("LLamada a funcion "+nombreFuncion+" invalida, faltan argumanetos, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
+			    	}
+		    	} else 
+		    		printError("La funcion "+nombreFuncion+" no puede ser llamada si no ha sido declarada");
+		    	
+		    	
 		    }
 		    else if (raiz instanceof NodoProgram) {
 		    	if(((NodoProgram)raiz).getFunctions()!=null){
@@ -123,10 +127,14 @@ public class Semantico {
 				// Verificar que tipo izquierdo y derecho sean boolean				
 				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
 				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
-				if( tipoIzquierdo == tipoDerecho )
-					return tipoIzquierdo;
+				if( tipoIzquierdo == "Boolean" && tipoDerecho == "Boolean" )
+					return "Boolean";	
+				else{
+					printError("Operandos de diferente tipo");
+					return "Otro";
+				}
 				
-			}else if(((NodoOperacion)nodo).getOperacion() 	== tipoOp.igual
+			} else if(((NodoOperacion)nodo).getOperacion() 	== tipoOp.igual
 					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.noigual){
 				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
 				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
@@ -134,8 +142,9 @@ public class Semantico {
 					return "Boolean";	
 				else if(tipoIzquierdo=="Int" && tipoDerecho=="Int")
 					return "Boolean";
-				else 
-					return "Int";
+				else {
+					printError("Operandos de diferente tipo");
+				}
 			} else if(((NodoOperacion)nodo).getOperacion() 	== tipoOp.mas 
 					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.menos
 					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.por
@@ -144,20 +153,30 @@ public class Semantico {
 				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
 				if( tipoIzquierdo == "Int" && tipoDerecho == "Int")									
 					return "Int";
-				else
-					return "Boolean";
+				else{
+					printError("Operandos de diferente tipo");
+					return "Otro";
+				}
 				
 			} else {
 				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
 				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
 				if( tipoIzquierdo == "Int" && tipoDerecho == "Int")
 					return "Boolean";
-				else 
-					return "Int";
+				else {
+					printError("Operandos de diferente tipo");
+					return "Otro";
+				}
 			}
 		}
 		else if(nodo instanceof NodoCallFuncion){
-			return tablaSimbolos.getTipoFuncion( ((NodoCallFuncion)nodo).getNombre() ) ;	    			
+			String nombreFuncion =  ((NodoCallFuncion)nodo).getNombre();
+			if(!tablaSimbolos.buscarAmbito(nombreFuncion))
+				return tablaSimbolos.getTipoFuncion( nombreFuncion ) ;	
+			else {
+	    		printError("La funcion "+nombreFuncion+" no puede ser llamada si no ha sido declarada");
+				return "Otro";
+			}
 		}		
 		else if(nodo instanceof NodoIdentificador){			
 		    String identificador = ((NodoIdentificador)nodo).getNombre();
@@ -207,7 +226,6 @@ public class Semantico {
 			if( tipoIzquierdo == tipoDerecho){
 				
 				arrayArgumentos.add(tipoDerecho);
-				// agregar al vector
 			} else{			
 				printError("Tipos diferentes");
 			}
@@ -235,9 +253,6 @@ public class Semantico {
 		}
 		return ban;
 	}	
-//	private void print(Object chain){
-//		System.out.println(chain);
-//	}
 	private void printError(Object chain){		
 		System.err.println("[Error Semantico]: "+chain);
 		this.anyError = true;
