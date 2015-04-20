@@ -56,19 +56,22 @@ public class TablaSimbolos {
 	    	
 	    } 	    
 	    else if (raiz instanceof NodoFuncion) {
-	    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion
-	    	
-	    	if(ultimoAmbito != "MAIN")
-	    		tablaFunciones.put(ultimoAmbito, ((NodoFuncion)raiz).getTipo());
-	    	
-	    	if( ((NodoFuncion)raiz).getArgs() != null){
-	    		cargarTabla(((NodoFuncion)raiz).getArgs());
-	    		arrayArgumentos = new ArrayList<String>();
-	    		cargarAgumentos(((NodoFuncion)raiz).getArgs());
-	    		tablaConArgumentos.put(ultimoAmbito, arrayArgumentos);
-	    	}
-	    	cargarTabla(((NodoFuncion)raiz).getSent());
-	    	
+	    	String nombreFuncion = ((NodoFuncion)raiz).getNombre();
+	    	if (buscarAmbito(nombreFuncion)){
+		    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion
+		    	
+		    	if(ultimoAmbito != "MAIN")
+		    		tablaFunciones.put(ultimoAmbito, ((NodoFuncion)raiz).getTipo());
+		    	
+		    	if( ((NodoFuncion)raiz).getArgs() != null){
+		    		cargarTabla(((NodoFuncion)raiz).getArgs());
+		    		arrayArgumentos = new ArrayList<String>();
+		    		cargarAgumentos(((NodoFuncion)raiz).getArgs());
+		    		tablaConArgumentos.put(ultimoAmbito, arrayArgumentos);
+		    	}
+		    	cargarTabla(((NodoFuncion)raiz).getSent());
+	    	} else 
+	    		printError("La funcion "+nombreFuncion+ " ya ha sido declarada");
 
 	    } 
 	    else if (raiz instanceof NodoProgram) {
@@ -184,17 +187,9 @@ public class TablaSimbolos {
 	}
 	
 	public boolean buscarAmbito(String ambito){	
-
-		if(tabla.containsKey(ambito))
-			return true;
-		else
-			return false;
+		return !tabla.containsKey(ambito);
 	}
-	
-	private void printError(Object chain){		
-		System.err.println("[Error Semantico]: "+chain);
-	}	
-	
+		
 	public void setUltimoAmbito(String Ambito)
 	{
 		ultimoAmbito = Ambito;
@@ -207,6 +202,10 @@ public class TablaSimbolos {
 	public Integer getiMem(String ambito){
 		return tablaiMem.get(ambito);
 	}
+	
+	private void printError(Object chain){		
+		System.err.println("[Error Semantico]: "+chain);
+	}		
 	/*
 	 * TODO:
 	 * 1. Crear lista con las lineas de codigo donde la variable es usada.
