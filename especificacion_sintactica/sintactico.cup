@@ -451,5 +451,6 @@ array::=ID:variable BRALEFT exp:ex BRARIGHT {:RESULT= new NodoIdentificador(vari
  :};
 
 sent_for_stmt ::= FOR LPAREN assign_stmt:asig SEMI exp:ex SEMI assign_stmt:paso RPAREN stmt_seq:cuerpo END {: RESULT = new NodoFor(cuerpo,ex,asig,paso);
-				:};
+				:}
+				| /* empty*/ ;
 
