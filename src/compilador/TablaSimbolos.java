@@ -8,6 +8,7 @@ import ast.*;
 public class TablaSimbolos {
 	private HashMap <String,String> tablaFunciones;
 	private HashMap <String, Integer> tablaiMem;
+	private HashMap <String, Integer> tablaPrimerParametro;
 	public ArrayList<String> arrayArgumentos;
 	private HashMap <String,ArrayList<String>> tablaConArgumentos;
 	private HashMap<String, HashMap<String, RegistroSimbolo>> tabla;
@@ -15,12 +16,18 @@ public class TablaSimbolos {
 	private int direccion;  //Contador de las localidades de memoria asignadas a la tabla
 	private String ultimoTipo;
 	private String ultimoAmbito;
+	
+	private HashMap <Funciones,HashMap<String, RegistroSimbolo> > tablaPrueba;
+	
 	public TablaSimbolos() {
 		super();
 		tabla = new HashMap<String, HashMap<String, RegistroSimbolo>>();
 		tablaFunciones = new HashMap<String, String>();
 		tablaConArgumentos = new HashMap<String, ArrayList<String>>();
 		tablaiMem = new HashMap <String, Integer>();
+		tablaPrimerParametro = new HashMap <String, Integer>();
+		tablaPrueba = new  HashMap <Funciones,HashMap<String, RegistroSimbolo> >();
+				
 		direccion=0;
 	}
 
@@ -56,12 +63,14 @@ public class TablaSimbolos {
 	    	
 	    } 	    
 	    else if (raiz instanceof NodoFuncion) {
+	    	
 	    	String nombreFuncion = ((NodoFuncion)raiz).getNombre();
 	    	if (buscarAmbito(nombreFuncion)){
 		    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion
-		    	
 		    	if(ultimoAmbito != "MAIN")
 		    		tablaFunciones.put(ultimoAmbito, ((NodoFuncion)raiz).getTipo());
+		    	
+		    	System.out.println(tablaFunciones);
 		    	
 		    	if( ((NodoFuncion)raiz).getArgs() != null){
 		    		cargarTabla(((NodoFuncion)raiz).getArgs());
@@ -107,11 +116,12 @@ public class TablaSimbolos {
 	
 	//true es nuevo no existe se insertara, false ya existe NO se vuelve a insertar 
 	public boolean InsertarSimbolo(String identificador, String ambito, String tipo,Integer tamano){
-		
+		boolean array = false;
 		if(tamano == 0){
 			printError("El vector " +identificador+"  no puede ser declarado de tamaño 0" );
 			return false;
-		}
+		} else if(tamano > 1)
+			array = true;
 		RegistroSimbolo simbolo;
 		// Si existe el ambito busco su tabla con los simbolos
 		if(tabla.containsKey(ambito)){
@@ -119,7 +129,7 @@ public class TablaSimbolos {
 			if(tablaAmbito.containsKey(identificador)){
 				return false; // si existe no lo creo
 			} else {
-				simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo);
+				simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo,array);
 				direccion = direccion + tamano;
 				tablaAmbito.put(identificador, simbolo);
 				return true;
@@ -127,10 +137,11 @@ public class TablaSimbolos {
 		} else {
 			// Si el ambito no existe creo la nueva tabla para ambito			
 			tablaAmbito = new HashMap<String, RegistroSimbolo>();
-			simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo);
+			simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo,array);
+			tablaPrimerParametro.put(ambito, direccion);
 			direccion = direccion + tamano;
 			tablaAmbito.put(identificador, simbolo);			
-			tabla.put(ambito, tablaAmbito);
+			tabla.put(ambito, tablaAmbito);			
 			return true;
 		}
 	}
@@ -164,6 +175,12 @@ public class TablaSimbolos {
 		RegistroSimbolo simbolo=(RegistroSimbolo)tablaAmbito.get(identificador);
 		return simbolo.getTipo();
 	}
+
+	public boolean getIfArray(String ambito, String identificador){
+		this.tablaAmbito = tabla.get(ambito);
+		RegistroSimbolo simbolo=(RegistroSimbolo)tablaAmbito.get(identificador);
+		return simbolo.getArray();
+	}	
 	
 	public boolean buscarTabla(String ambito, String identificador){
 		if(tabla.containsKey(ambito)){
@@ -187,7 +204,7 @@ public class TablaSimbolos {
 	}
 	
 	public boolean buscarAmbito(String ambito){	
-		return !tabla.containsKey(ambito);
+		return !tablaFunciones.containsKey(ambito);
 	}
 		
 	public void setUltimoAmbito(String Ambito)
@@ -201,6 +218,12 @@ public class TablaSimbolos {
 	
 	public Integer getiMem(String ambito){
 		return tablaiMem.get(ambito);
+	}
+	
+	public Integer getPrimerArgumento(String ambito){
+		Integer x = 1;
+		x = tablaPrimerParametro.get(ambito);
+		return x;
 	}
 	
 	private void printError(Object chain){		

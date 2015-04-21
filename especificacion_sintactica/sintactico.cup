@@ -4,7 +4,7 @@ import java_cup.runtime.*;
 import ast.*;
 
 action code {:
-	private boolean modoDepuracion=true;
+	private boolean modoDepuracion=false;
 	private NodoBase ast=null;
 	public int lineanum=0;
 	
@@ -239,7 +239,10 @@ stmt        ::= if_stmt:sif	{: if(modoDepuracion) System.out.println("\t regla 3
             | RETURN exp:ex {:		if(modoDepuracion) System.out.println("\t regla 3j");
             		RESULT= new NodoReturn(ex);
             	:}
-            | error				{: if(modoDepuracion) System.out.println("\t regla 3k"); 
+            | RETURN {:		if(modoDepuracion) System.out.println("\t regla 3k");
+            		RESULT= new NodoReturn(null);
+            	:}
+            | error				{: if(modoDepuracion) System.out.println("\t regla 3l"); 
 				System.out.println("Ocurrio error en cup # 0004");
 				RESULT=null;
 				:}
@@ -270,7 +273,7 @@ assign_stmt ::= ID:variable 	{: if(modoDepuracion) System.out.println("\t regla 
 					System.out.println("Ocurrio error en cup # 0001");
 					}
 					:}
-			| array:vector ASSIGN simple_exp:ex	{: 
+			| array:vector ASSIGN exp:ex	{: 
 				RESULT=new NodoAsignacion(vector,ex); 
 			:}
 		;

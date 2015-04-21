@@ -34,10 +34,12 @@ public class Compilador {
 		Semantico semantico = new Semantico(tablaSimbolos);
 		semantico.recorrerArbol(root);
 		
+
 		UtGen.abrir_archivo();
 		Generador.setTablaSimbolos(tablaSimbolos);
 		Generador.generarCodigoObjeto(root);
 		UtGen.cerrar_archivo();
+
 		//Para generar solo el codigodel main
 		// tablaSimbolos.setUltimoAmbito("main");
 		//Generador.generarCodigoObjeto(((NodoProgram)root).getMain());
