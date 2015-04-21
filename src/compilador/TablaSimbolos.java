@@ -8,6 +8,7 @@ import ast.*;
 public class TablaSimbolos {
 	private HashMap <String,String> tablaFunciones;
 	private HashMap <String, Integer> tablaiMem;
+	private HashMap <String, Integer> tablaPrimerParametro;
 	public ArrayList<String> arrayArgumentos;
 	private HashMap <String,ArrayList<String>> tablaConArgumentos;
 	private HashMap<String, HashMap<String, RegistroSimbolo>> tabla;
@@ -24,7 +25,9 @@ public class TablaSimbolos {
 		tablaFunciones = new HashMap<String, String>();
 		tablaConArgumentos = new HashMap<String, ArrayList<String>>();
 		tablaiMem = new HashMap <String, Integer>();
+		tablaPrimerParametro = new HashMap <String, Integer>();
 		tablaPrueba = new  HashMap <Funciones,HashMap<String, RegistroSimbolo> >();
+				
 		direccion=0;
 	}
 
@@ -135,9 +138,10 @@ public class TablaSimbolos {
 			// Si el ambito no existe creo la nueva tabla para ambito			
 			tablaAmbito = new HashMap<String, RegistroSimbolo>();
 			simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo,array);
+			tablaPrimerParametro.put(ambito, direccion);
 			direccion = direccion + tamano;
 			tablaAmbito.put(identificador, simbolo);			
-			tabla.put(ambito, tablaAmbito);
+			tabla.put(ambito, tablaAmbito);			
 			return true;
 		}
 	}
@@ -214,6 +218,12 @@ public class TablaSimbolos {
 	
 	public Integer getiMem(String ambito){
 		return tablaiMem.get(ambito);
+	}
+	
+	public Integer getPrimerArgumento(String ambito){
+		Integer x = 1;
+		x = tablaPrimerParametro.get(ambito);
+		return x;
 	}
 	
 	private void printError(Object chain){		
