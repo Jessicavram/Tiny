@@ -46,6 +46,7 @@ public class Semantico {
 		    		recorrerArbol(((NodoProgram)raiz).getFunctions());
 		    	}	
 		    	ultimoAmbito = "main";
+		    	recorrerFuncion(((NodoProgram)raiz).getMain(), "Void", ultimoAmbito);
 		    	recorrerArbol(((NodoProgram)raiz).getMain());
 		    }  		    	
 		    raiz = raiz.getHermanoDerecha();
@@ -122,6 +123,9 @@ public class Semantico {
     	if(( (((NodoFuncion)nodo).getTipo())=="Int" || (((NodoFuncion)nodo).getTipo())=="Boolean") 
     			&& !recorrerFuncion(((NodoFuncion)nodo).getSent(),((NodoFuncion)nodo).getTipo(),((NodoFuncion)nodo).getNombre()))
     		printError("La funcion "+((NodoFuncion)nodo).getNombre()+" debe contener una clausula RETURN");
+    	else if(((NodoFuncion)nodo).getTipo()=="Void"){
+    		recorrerFuncion(((NodoFuncion)nodo).getSent(),((NodoFuncion)nodo).getTipo(),((NodoFuncion)nodo).getNombre());
+    	}
     	recorrerArbol(((NodoFuncion)nodo).getSent());
 	}	
 	
@@ -309,8 +313,22 @@ public class Semantico {
 		while (raiz != null) {
 			if(raiz instanceof NodoReturn){				
 			    ban=true;
-			    if (comprobarTipo(((NodoReturn)raiz).getExpresion())!=Tipo)
-			    	System.err.println("El tipo de dato retornado en la funcion "+nombre+" no corresponde. Debe ser tipo "+Tipo);
+			   if(Tipo!="Void"){
+				   //Si entro es una funcion con return exp
+				   if((((NodoReturn)raiz).getExpresion())!=null){
+					   //Si entro si es correcto es return exp
+					   if (comprobarTipo(((NodoReturn)raiz).getExpresion())!=Tipo)
+				    		System.err.println("El tipo de dato retornado en la funcion "+nombre+" no corresponde. Debe ser tipo "+Tipo);
+				   }else{
+					   //Error no tiene exp y debe tene expresion
+					   System.err.println("La expresion return no es compatible con el tipo de funcion. Debe retornar un dato de tipo "+Tipo);
+				   }	
+			   }else{
+				   if((((NodoReturn)raiz).getExpresion())!=null)
+					   //error tiene exp y no debe retornar nada
+					   System.err.println("La expresion return no es compatible con el tipo de funcion. Debe retornar vacio");
+			   }
+				   
 			}
 			raiz = raiz.getHermanoDerecha();
 		}

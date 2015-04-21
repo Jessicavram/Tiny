@@ -319,14 +319,20 @@ public class Generador {
 			generar(((NodoProgram) nodo).getFunctions(),true);
 	}
 		if(((NodoProgram) nodo).getMain()!=null){
-			ultimoAmbito = "main";
-			
+			ultimoAmbito = "main";			
 			//iniciar la ejecucion en la linea #line main
 			int pos = UtGen.emitirSalto(0);
 			UtGen.cargarRespaldo(saltomain);
 			UtGen.emitirRM("LDA", UtGen.PC, pos,UtGen.GP, "Salto incodicional al main");
 			UtGen.restaurarRespaldo();
 			generar(((NodoProgram) nodo).getMain(),true);
+			pos=UtGen.emitirSalto(0);
+			for	(int i=0; i<localidad_return.size();i++){
+				UtGen.cargarRespaldo(localidad_return.get(i));
+				UtGen.emitirRM("LDA", UtGen.PC, pos, UtGen.GP, "salto del return");
+				UtGen.restaurarRespaldo();
+			}
+			localidad_return.clear();
 		}
 	}
 	private static void generarFuncion(NodoBase nodo){
@@ -381,7 +387,8 @@ public class Generador {
 		
 	}
 	private static void generarReturn(NodoBase nodo){
-		generar(((NodoReturn)nodo).getExpresion(),true);
+		if(((NodoReturn)nodo).getExpresion()!=null)
+		       generar(((NodoReturn)nodo).getExpresion(),true);
 		//la setencia anterior deja en AC el valor retornado		
 		//Guargo una posicion para saltar a la linea donde termina la funcion
 		localidad_return.add(UtGen.emitirSalto(1));
@@ -392,14 +399,11 @@ public class Generador {
 		NodoCallFuncion n = (NodoCallFuncion)nodo;		
 		if (n.getArgs()!=null){	
 			NodoBase aux = n.getArgs();
+			int pos = tablaSimbolos.getPrimerArgumento(((NodoCallFuncion)nodo).getNombre());
 			do{			
-				generar(aux,false); //deja es AC el valor
-				//cambiar de ambito 
-				//buscar la direccion de memoria
-				//guardar en esa direccion
-				//cambiar de ambito de nuevo al actual 
-				UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el argumento");	
-				
+				generar(aux,false); //deja es AC el valor 
+				UtGen.emitirRM("ST", UtGen.AC, pos, UtGen.GP, "llamado: guarda el valor del argumento");	
+				pos+=1;
 				aux=aux.getHermanoDerecha();
 			}while(aux!=null);
 		}	

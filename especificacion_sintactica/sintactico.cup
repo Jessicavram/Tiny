@@ -239,7 +239,10 @@ stmt        ::= if_stmt:sif	{: if(modoDepuracion) System.out.println("\t regla 3
             | RETURN exp:ex {:		if(modoDepuracion) System.out.println("\t regla 3j");
             		RESULT= new NodoReturn(ex);
             	:}
-            | error				{: if(modoDepuracion) System.out.println("\t regla 3k"); 
+            | RETURN {:		if(modoDepuracion) System.out.println("\t regla 3k");
+            		RESULT= new NodoReturn(null);
+            	:}
+            | error				{: if(modoDepuracion) System.out.println("\t regla 3l"); 
 				System.out.println("Ocurrio error en cup # 0004");
 				RESULT=null;
 				:}

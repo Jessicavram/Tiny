@@ -1,4 +1,6 @@
+
 package compilador;
+import java.io.*;
 
 /* La idea principal de esta clase (Utilidades de Generacion)es ayudar a emitir las 
  * sentencias en el asembler de la Tiny Machine (TM), haciendo mas sencilla la 
@@ -10,7 +12,7 @@ package compilador;
 public class UtGen {
 	private static int instruccionActual=0;	//Direccion (num linea) actual de emision de la instruccion
 	private static int instruccionMasAlta=0;	//Almacena la direccion de la instruccion que ha resultado ser la mayor hasta ahora 
-	public static boolean debug=false;
+	public static boolean debug=true;
 
 	/* PC = program counter, registro[7] donde se almacena la direccion (linea)
 	 *  actual de ejecucion del codigo objeto 
@@ -26,9 +28,6 @@ public class UtGen {
 	 * al inicio de la memoria para el almacenamiento de variables globales
 	 */
 	public static int  GP=5;
-	
-	/* Defino al registro[4] como el Numero de Linea a retornar */
-	public static int  NL=4;
 
 	/* Defino al registro[0] como el acumulador 1 */
 	public static int  AC=0;
@@ -36,11 +35,41 @@ public class UtGen {
 	/* Defino al registro[1] como el acumulador 2 */
 	public static int  AC1=1;
 	
+	/* Defino al registro[4] como el Numero de Linea a retornar */
+	public static int  NL=1;
+	
+	/*Fichero para guardar el codigo generado para Tiny*/
+	public static FileWriter fichero=null;
+	
+	public static PrintWriter pw=null;
+	
 	
 	public static void emitirComentario(String c){
 		if(debug) System.out.println("*      "+c);
 	}
-
+	public static void abrir_archivo(){
+		try {
+			fichero=new FileWriter("C:\\Users\\Tyson\\git\\tiny\\archivo.tm");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public static void cerrar_archivo(){
+		try {
+			fichero.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		try {
+			fichero.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	/* Este procedimiento emite sentencias RO (Solo Registro)
 	 * de la TM    opcode r,s,t 
 	 * r[r] = reg[s] op reg[t]
@@ -51,8 +80,17 @@ public class UtGen {
 	 * t = segundo registro operando
 	 * c = comentario a emitir en modo debug
 	 */
-	public static void emitirRO(String op, int r, int s, int t, String c){
-		System.out.print((instruccionActual++)+":       "+op+"       "+r+","+s+","+t );
+	public static void emitirRO(String op, int r, int s, int t, String c) {
+		String salto=System.getProperty("line.separator");
+		 try {
+				fichero.write((instruccionActual)+":       "+op+"       "+r+","+s+","+t+salto);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		System.out.print((instruccionActual++)+":       "+op+"       "+r+","+s+","+t);
+	   
+	 
 		if(debug)
 			System.out.print("      "+c);
 		System.out.print("\n");
@@ -70,8 +108,16 @@ public class UtGen {
 	 * s = registro con la direccion base
 	 * c = comentario a emitir en modo debug
 	 */	
-	public static void emitirRM(String op, int r, int d, int s, String c){
+	public static void emitirRM(String op, int r, int d, int s, String c) {
+		String salto=System.getProperty("line.separator");
+		try {
+			fichero.write((instruccionActual)+":       "+op+"       "+r+","+d+"("+s+")"+salto);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.print((instruccionActual++)+":       "+op+"       "+r+","+d+"("+s+")" );
+		
 		if(debug)
 			System.out.print("      "+c);
 		System.out.print("\n");
@@ -117,7 +163,17 @@ public class UtGen {
 	 * c = comentario a emitir en modo debug
 	 */
 	public static void emitirRM_Abs(String op, int r, int a, String c){
+		String salto=System.getProperty("line.separator");
+		try {
+			fichero.write((instruccionActual)+":       "+op+"       "+r+","+(a-(instruccionActual+1))+"("+PC+")"+salto);
+			
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.print((instruccionActual)+":       "+op+"       "+r+","+(a-(instruccionActual+1))+"("+PC+")" );
+		
+
 		++instruccionActual;
 		if(debug)
 			System.out.print("      "+c);
