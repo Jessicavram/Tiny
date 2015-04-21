@@ -1,8 +1,20 @@
+begin 
+	
+int a,b[10],c,g;
+	
+boolean d;
 
-begin
-int i;
-	i:=i+2;
-	if i<4 then
-	  i:=3;
-	 end;
+d:=true;
+c:=0;
+b[0]:=2;
+a:=1;
+	
+
+
+b[1]:=b[0]*a;
+	
+if d!=false or c=1 and c>=3 then
+b[2]:=4;
+end;
+read d;
 end
