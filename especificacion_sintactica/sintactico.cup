@@ -4,7 +4,7 @@ import java_cup.runtime.*;
 import ast.*;
 
 action code {:
-	private boolean modoDepuracion=true;
+	private boolean modoDepuracion=false;
 	private NodoBase ast=null;
 	public int lineanum=0;
 	
@@ -270,7 +270,7 @@ assign_stmt ::= ID:variable 	{: if(modoDepuracion) System.out.println("\t regla 
 					System.out.println("Ocurrio error en cup # 0001");
 					}
 					:}
-			| array:vector ASSIGN simple_exp:ex	{: 
+			| array:vector ASSIGN exp:ex	{: 
 				RESULT=new NodoAsignacion(vector,ex); 
 			:}
 		;
