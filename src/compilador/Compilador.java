@@ -58,10 +58,6 @@ public class Compilador {
 			UtGen.cerrar_archivo();
 		}
 
-		//Para generar solo el codigodel main
-//		tablaSimbolos.setUltimoAmbito("main");
-		//Generador.generarCodigoObjeto(((NodoProgram)root).getMain());
-
 	}
 
 }
