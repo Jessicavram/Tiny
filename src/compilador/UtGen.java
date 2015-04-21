@@ -26,6 +26,9 @@ public class UtGen {
 	 * al inicio de la memoria para el almacenamiento de variables globales
 	 */
 	public static int  GP=5;
+	
+	/* Defino al registro[4] como el Numero de Linea a retornar */
+	public static int  NL=4;
 
 	/* Defino al registro[0] como el acumulador 1 */
 	public static int  AC=0;
@@ -33,8 +36,6 @@ public class UtGen {
 	/* Defino al registro[1] como el acumulador 2 */
 	public static int  AC1=1;
 	
-	/* Defino al registro[4] como el Numero de Linea a retornar */
-	public static int  NL=1;
 	
 	public static void emitirComentario(String c){
 		if(debug) System.out.println("*      "+c);
