@@ -392,14 +392,11 @@ public class Generador {
 		NodoCallFuncion n = (NodoCallFuncion)nodo;		
 		if (n.getArgs()!=null){	
 			NodoBase aux = n.getArgs();
+			int pos = tablaSimbolos.getPrimerArgumento(((NodoCallFuncion)nodo).getNombre());
 			do{			
-				generar(aux,false); //deja es AC el valor
-				//cambiar de ambito 
-				//buscar la direccion de memoria
-				//guardar en esa direccion
-				//cambiar de ambito de nuevo al actual 
-				UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el argumento");	
-				
+				generar(aux,false); //deja es AC el valor 
+				UtGen.emitirRM("ST", UtGen.AC, pos, UtGen.GP, "llamado: guarda el valor del argumento");	
+				pos+=1;
 				aux=aux.getHermanoDerecha();
 			}while(aux!=null);
 		}	

@@ -34,8 +34,8 @@ public class Compilador {
 		Semantico semantico = new Semantico(tablaSimbolos);
 		semantico.recorrerArbol(root);
 		
-//		Generador.setTablaSimbolos(tablaSimbolos);
-//		Generador.generarCodigoObjeto(root);
+		Generador.setTablaSimbolos(tablaSimbolos);
+		Generador.generarCodigoObjeto(root);
 				
 		//Para generar solo el codigodel main
 		// tablaSimbolos.setUltimoAmbito("main");
