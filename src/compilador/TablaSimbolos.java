@@ -6,31 +6,30 @@ import java.util.*;
 import ast.*;
 
 public class TablaSimbolos {
-	private HashMap <String,String> tablaFunciones;
+	private HashMap <String,String> tablaTipo;
 	private HashMap <String, Integer> tablaiMem;
-	private HashMap <String, Integer> tablaPrimerParametro;
-	public ArrayList<String> arrayArgumentos;
-	private HashMap <String,ArrayList<String>> tablaConArgumentos;
+	private HashMap <String, Integer> tablaPrimerParametro;	
 	private HashMap<String, HashMap<String, RegistroSimbolo>> tabla;
 	private HashMap<String, RegistroSimbolo> tablaAmbito;
 	private int direccion;  //Contador de las localidades de memoria asignadas a la tabla
 	private String ultimoTipo;
 	private String ultimoAmbito;
+	public boolean error = false;
 	
-	private HashMap <Funciones,HashMap<String, RegistroSimbolo> > tablaPrueba;
+	// Auxiliares
+	public ArrayList<String> arrayArgumentos;
+	private HashMap <String,ArrayList<String>> tablaConArgumentos;
 	
 	public TablaSimbolos() {
 		super();
 		tabla = new HashMap<String, HashMap<String, RegistroSimbolo>>();
-		tablaFunciones = new HashMap<String, String>();
+		tablaTipo = new HashMap<String, String>();
 		tablaConArgumentos = new HashMap<String, ArrayList<String>>();
 		tablaiMem = new HashMap <String, Integer>();
-		tablaPrimerParametro = new HashMap <String, Integer>();
-		tablaPrueba = new  HashMap <Funciones,HashMap<String, RegistroSimbolo> >();
-				
+		tablaPrimerParametro = new HashMap <String, Integer>();				
 		direccion=0;
 	}
-
+	
 	public void cargarTabla(NodoBase raiz){
 		while (raiz != null) {
 	    /* Hago el recorrido recursivo */
@@ -68,10 +67,8 @@ public class TablaSimbolos {
 	    	if (buscarAmbito(nombreFuncion)){
 		    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion
 		    	if(ultimoAmbito != "MAIN")
-		    		tablaFunciones.put(ultimoAmbito, ((NodoFuncion)raiz).getTipo());
-		    	
-		    	System.out.println(tablaFunciones);
-		    	
+		    		tablaTipo.put(ultimoAmbito, ((NodoFuncion)raiz).getTipo());
+		    			    	
 		    	if( ((NodoFuncion)raiz).getArgs() != null){
 		    		cargarTabla(((NodoFuncion)raiz).getArgs());
 		    		arrayArgumentos = new ArrayList<String>();
@@ -129,7 +126,7 @@ public class TablaSimbolos {
 			if(tablaAmbito.containsKey(identificador)){
 				return false; // si existe no lo creo
 			} else {
-				simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo,array);
+				simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo,array,false);
 				direccion = direccion + tamano;
 				tablaAmbito.put(identificador, simbolo);
 				return true;
@@ -137,7 +134,7 @@ public class TablaSimbolos {
 		} else {
 			// Si el ambito no existe creo la nueva tabla para ambito			
 			tablaAmbito = new HashMap<String, RegistroSimbolo>();
-			simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo,array);
+			simbolo= new RegistroSimbolo(identificador,-1, direccion, tipo,array,false);
 			tablaPrimerParametro.put(ambito, direccion);
 			direccion = direccion + tamano;
 			tablaAmbito.put(identificador, simbolo);			
@@ -170,7 +167,7 @@ public class TablaSimbolos {
 	    return simbolo.getDireccionMemoria();
 	}
 	
-	public String getTipo(String ambito, String identificador){
+ 	public String getTipo(String ambito, String identificador){
 		this.tablaAmbito = tabla.get(ambito);
 		RegistroSimbolo simbolo=(RegistroSimbolo)tablaAmbito.get(identificador);
 		return simbolo.getTipo();
@@ -196,7 +193,7 @@ public class TablaSimbolos {
 	}
 	
 	public String getTipoFuncion(String funcion){		
-		return tablaFunciones.get(funcion);
+		return tablaTipo.get(funcion);
 	}
 	
 	public ArrayList<String> getArrayArguments(String ambito){
@@ -204,7 +201,7 @@ public class TablaSimbolos {
 	}
 	
 	public boolean buscarAmbito(String ambito){	
-		return !tablaFunciones.containsKey(ambito);
+		return !tablaTipo.containsKey(ambito);
 	}
 		
 	public void setUltimoAmbito(String Ambito)
@@ -226,8 +223,26 @@ public class TablaSimbolos {
 		return x;
 	}
 	
+	public boolean getInizializacion(String ambito, String Clave ){
+	    tablaAmbito = tabla.get(ambito);
+	    RegistroSimbolo simbolo = tablaAmbito.get(Clave);
+	    return simbolo.getInicializado();
+	}
+	
+	public void setInizializacion(String ambito, String identificador,boolean inicializado ){
+	    tablaAmbito = tabla.get(ambito);
+	    RegistroSimbolo simbolo = tablaAmbito.get(identificador);
+	    tablaAmbito.remove(identificador);
+
+	    simbolo.setInicializado(inicializado);	    
+
+	    tablaAmbito.put(identificador, simbolo);	    
+	    tabla.put(ambito, tablaAmbito);
+	}	
+	
 	private void printError(Object chain){		
 		System.err.println("[Error Semantico]: "+chain);
+		error = true;
 	}		
 	/*
 	 * TODO:
