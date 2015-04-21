@@ -18,93 +18,28 @@ public class Semantico {
 	public void recorrerArbol(NodoBase raiz){		
 		
 		while (raiz != null) {
-		    if (raiz instanceof NodoIdentificador){	 	    	
-		    	// Compruebo que la variable ha sido declara en el ambito
-		    	verificarExistenciaDeVariable(((NodoIdentificador)raiz).getNombre());		    		
+			/* Hago el recorrido recursivo */
+			if (raiz instanceof NodoIdentificador){	 	
+				 verificarIdentificador(raiz);		    		
 		    }	
-		    /* Hago el recorrido recursivo */
-		    if (raiz instanceof  NodoIf){
-		    	if (comprobarTipo(((NodoIf)raiz).getPrueba()) != "Boolean")
-		    	printError("No se puede probar la expresion en el if");
-		    	
-		    	recorrerArbol(((NodoIf)raiz).getParteThen());
-		    	if(((NodoIf)raiz).getParteElse()!=null){
-		    		recorrerArbol(((NodoIf)raiz).getParteElse());
-		    	}
-		    	
-		    }
-		    else if (raiz instanceof  NodoRepeat){
-		    	recorrerArbol(((NodoRepeat)raiz).getCuerpo());
-		    	if (comprobarTipo(((NodoRepeat)raiz).getPrueba()) != "Boolean")
-		    		printError("No se puede probar la expresion en el repeat");
-		    }
-		    else if (raiz instanceof  NodoAsignacion){	    	
-		    	// Compruebo que la variable a asignar ha sido declara en el ambito
-		    	String identificador = ((NodoAsignacion)raiz).getIdentificador();
-		    	
-		    	if (verificarExistenciaDeVariable(identificador)){	    	
-		    		String tipo = tablaSimbolos.getTipo(ultimoAmbito, identificador);
-		    		if(comprobarTipo(((NodoAsignacion)raiz).getExpresion()) != tipo){
-		    			printError("Asignacion a variable de diferente tipo");
-		    		}
-		    	}
-		    }
+			else if (raiz instanceof  NodoIf)
+		    	verificarIf(raiz);
+		    else if (raiz instanceof  NodoRepeat)
+		    	verificarRepeat(raiz);
+		    else if (raiz instanceof  NodoAsignacion)	    	
+		    	verificarAsignacion(raiz);		    	
 		    else if (raiz instanceof  NodoEscribir)
-		    	recorrerArbol(((NodoEscribir)raiz).getExpresion());
-		    else if (raiz instanceof NodoOperacion){		    	
-				NodoBase tipoIzquierdo 	= (NodoBase) ((NodoOperacion)raiz).getOpIzquierdo();
-				NodoBase tipoDerecho 	= (NodoBase) ((NodoOperacion)raiz).getOpDerecho();
-	
-				// Comprobacion de tipo en expresion
-				if( comprobarTipo(tipoDerecho) != comprobarTipo(tipoIzquierdo) )
-					printError("Tipos diferentes");		    	
-		    }
-		    else if (raiz instanceof NodoDeclaracion) {
-		    	recorrerArbol(((NodoDeclaracion)raiz).getVariable());
-		    } 
-		    else if (raiz instanceof NodoFor) {
-		    	NodoBase nodo = (((NodoFor)raiz).getAsignacion());
-		
-		    	recorrerArbol(nodo);
-		    	if (comprobarTipo(((NodoAsignacion)nodo).getExpresion()) != "Int")
-		    		printError("No se puede probar la expresion de asignacion en la sentencia for");
-		    	if (comprobarTipo(((NodoFor)raiz).getPrueba()) != "Boolean")
-		    		printError("No se puede probar la expresion prueba en la sentencia for");
-		   
-		    	nodo = (((NodoFor)raiz).getPaso());
-		    	recorrerArbol(nodo);
-		    	if (comprobarTipo(((NodoAsignacion)nodo).getExpresion()) != "Int")
-		    		printError("No se puede probar la expresion paso en la sentencia for");		    	
-		    	
-		    	recorrerArbol(((NodoFor)raiz).getCuerpo());		
-		    }
-		    else if (raiz instanceof NodoFuncion) {
-		    	ultimoAmbito = ((NodoFuncion)raiz).getNombre();	// Cambio el ambito cuando entro a una funcion    	    	
-		    	//Buscar el return
-		    	if(( (((NodoFuncion)raiz).getTipo())=="Int" || (((NodoFuncion)raiz).getTipo())=="Boolean") && !recorrerFuncion(((NodoFuncion)raiz).getSent(),((NodoFuncion)raiz).getTipo(),((NodoFuncion)raiz).getNombre()))
-		    		printError("La funcion "+((NodoFuncion)raiz).getNombre()+" debe contener una clausula RETURN");
-		    	recorrerArbol(((NodoFuncion)raiz).getSent());
-		    } 
-		    else if (raiz instanceof NodoCallFuncion) {	
-		    	
-	    		ArrayList<String> arrayArgumentos 	= new ArrayList<String>();
-		    	String nombreFuncion 				= ((NodoCallFuncion)raiz).getNombre();
-		    	if(!tablaSimbolos.buscarAmbito(nombreFuncion)){
-			    	if(((NodoCallFuncion)raiz).getArgs() != null){
-			    		recorrerArbol((((NodoCallFuncion)raiz).getArgs()));
-				    	recorrerArgumentos((((NodoCallFuncion)raiz).getArgs()),arrayArgumentos);
-				    	if (!tablaSimbolos.getArrayArguments( nombreFuncion).equals(arrayArgumentos) ){ 
-				    		printError("Llamada a funcion "+nombreFuncion+" invalida, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
-				    	}		    		
-			    	} else if (tablaSimbolos.getArrayArguments( nombreFuncion) != null ){
-			    		if(tablaSimbolos.getArrayArguments( nombreFuncion).size() != 0 )
-			    			printError("LLamada a funcion "+nombreFuncion+" invalida, faltan argumanetos, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
-			    	}
-		    	} else 
-		    		printError("La funcion "+nombreFuncion+" no puede ser llamada si no ha sido declarada");
-		    	
-		    	
-		    }
+		    	verificarEscribir(raiz);    
+		    else if (raiz instanceof NodoOperacion)		    	
+		    	verificarOperacion(raiz);
+		    else if (raiz instanceof NodoDeclaracion) 
+		    	verificarDeclaracion(raiz); 
+		    else if (raiz instanceof NodoFor) 
+		    	verificarFor(raiz);
+		    else if (raiz instanceof NodoFuncion)
+		    	verificarFuncion(raiz);		     
+		    else if (raiz instanceof NodoCallFuncion) 	
+		    	verificarCallFuncion(raiz);		    
 		    else if (raiz instanceof NodoProgram) {
 		    	if(((NodoProgram)raiz).getFunctions()!=null){
 		    		recorrerArbol(((NodoProgram)raiz).getFunctions());
@@ -119,73 +54,172 @@ public class Semantico {
 		
 	}
 		
+	// Nodos INIT	
+	
+	private void verificarIf(NodoBase nodo){
+    	if (comprobarTipo(((NodoIf)nodo).getPrueba()) != "Boolean")
+    		printError("No se puede probar la expresion en el if");
+    	
+    	recorrerArbol(((NodoIf)nodo).getParteThen());
+    	if(((NodoIf)nodo).getParteElse()!=null){
+    		recorrerArbol(((NodoIf)nodo).getParteElse());
+    	}  			
+	}
+	
+	private void verificarRepeat(NodoBase nodo){
+    	recorrerArbol(((NodoRepeat)nodo).getCuerpo());
+    	if (comprobarTipo(((NodoRepeat)nodo).getPrueba()) != "Boolean")
+    		printError("No se puede probar la expresion en el repeat");		
+	}
+	
+	private void verificarAsignacion(NodoBase nodo){
+		//Compruebo que la variable a asignar ha sido declara en el ambito		
+		recorrerAsignacion(nodo);
+	}
+
+	private void verificarEscribir(NodoBase nodo){
+		recorrerArbol(((NodoEscribir)nodo).getExpresion());
+	}
+
+	private void verificarDeclaracion(NodoBase nodo){
+//		recorrerArbol(((NodoDeclaracion)nodo).getVariable());
+	}
+	
+	private void verificarOperacion(NodoBase nodo){
+		NodoBase tipoIzquierdo 	= (NodoBase) ((NodoOperacion)nodo).getOpIzquierdo();
+		NodoBase tipoDerecho 	= (NodoBase) ((NodoOperacion)nodo).getOpDerecho();
+
+		// Comprobacion de tipo en expresion
+		if( comprobarTipo(tipoDerecho) != comprobarTipo(tipoIzquierdo) )
+			printError("Tipos diferentes");	
+	}
+	
+	private void verificarFor(NodoBase raiz){
+    	NodoBase nodo = (((NodoFor)raiz).getAsignacion());
+		
+    	recorrerArbol(nodo);
+    	if (comprobarTipo(((NodoAsignacion)nodo).getExpresion()) != "Int")
+    		printError("No se puede probar la expresion de asignacion en la sentencia for");
+    	if (comprobarTipo(((NodoFor)raiz).getPrueba()) != "Boolean")
+    		printError("No se puede probar la expresion prueba en la sentencia for");
+   
+    	nodo = (((NodoFor)raiz).getPaso());
+    	recorrerArbol(nodo);
+    	if (comprobarTipo(((NodoAsignacion)nodo).getExpresion()) != "Int")
+    		printError("No se puede probar la expresion paso en la sentencia for");		    	
+    	
+    	recorrerArbol(((NodoFor)raiz).getCuerpo());	
+	}
+	
+	private void verificarFuncion(NodoBase nodo){
+    	ultimoAmbito = ((NodoFuncion)nodo).getNombre();	// Cambio el ambito cuando entro a una funcion    	    	
+    	//Buscar el return
+    	if(( (((NodoFuncion)nodo).getTipo())=="Int" || (((NodoFuncion)nodo).getTipo())=="Boolean") 
+    			&& !recorrerFuncion(((NodoFuncion)nodo).getSent(),((NodoFuncion)nodo).getTipo(),((NodoFuncion)nodo).getNombre()))
+    		printError("La funcion "+((NodoFuncion)nodo).getNombre()+" debe contener una clausula RETURN");
+    	recorrerArbol(((NodoFuncion)nodo).getSent());
+	}
+	
+	private void verificarCallFuncion(NodoBase nodo){
+		ArrayList<String> arrayArgumentos 	= new ArrayList<String>();
+    	String nombreFuncion 				= ((NodoCallFuncion)nodo).getNombre();
+    	NodoBase argumentos 				= ((NodoCallFuncion)nodo).getArgs();
+    	
+    	// Si la funcion ha sido declarada
+    	if(verificarExistenciaDeFuncion(nombreFuncion)){
+    		// Si la funcion tiene argumentos
+	    	if(argumentos != null){
+	    		recorrerArbol((argumentos));			    		
+		    	recorrerArgumentos((argumentos),arrayArgumentos);
+		    	// Si la funcion recibe argumentos
+		    	if (tablaSimbolos.getArrayArguments( nombreFuncion) != null) {
+			    	if (!tablaSimbolos.getArrayArguments( nombreFuncion).equals(arrayArgumentos) ){ 
+			    		printError("Llamada a funcion "+nombreFuncion+" invalida, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
+			    	}		
+		    	} else {
+		    		printError("Llamada a funcion "+nombreFuncion+" invalida, debe ser "+nombreFuncion+ "()");
+		    	}
+	    	} else if (tablaSimbolos.getArrayArguments( nombreFuncion) != null ){
+	    		if(tablaSimbolos.getArrayArguments( nombreFuncion).size() != 0 )
+	    			printError("LLamada a funcion "+nombreFuncion+" invalida, faltan argumanetos, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
+	    	}
+    	} 
+    	
+    	
+	}
+		
+	// Nodos END
 	
 	private String comprobarTipo(NodoBase nodo){
 		if (nodo instanceof NodoOperacion){
-			if(((NodoOperacion)nodo).getOperacion() 	== tipoOp.and 
-				|| ((NodoOperacion)nodo).getOperacion() == tipoOp.or){
-				// Verificar que tipo izquierdo y derecho sean boolean				
-				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
-				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
+			
+			String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
+			String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());			
+			tipoOp operador 		= ((NodoOperacion)nodo).getOperacion();
+			
+			if(operador == tipoOp.and || operador == tipoOp.or){
+				// Si el operador es and o or ambos operando deben ser Boolean			
 				if( tipoIzquierdo == "Boolean" && tipoDerecho == "Boolean" )
 					return "Boolean";	
 				else{
 					printError("Operandos de diferente tipo");
-					return "Otro";
+					return "TyperEror";
 				}
 				
-			} else if(((NodoOperacion)nodo).getOperacion() 	== tipoOp.igual
-					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.noigual){
-				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
-				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
+			} else if(operador == tipoOp.igual || operador == tipoOp.noigual){
+				// Si el operador es igual o diferente debe ser ambos operandos Boolean o Int 
 				if( tipoIzquierdo == "Boolean" && tipoDerecho == "Boolean" )
 					return "Boolean";	
 				else if(tipoIzquierdo=="Int" && tipoDerecho=="Int")
 					return "Boolean";
 				else {
 					printError("Operandos de diferente tipo");
+					return "TypeError";
 				}
-			} else if(((NodoOperacion)nodo).getOperacion() 	== tipoOp.mas 
-					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.menos
-					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.por
-					|| ((NodoOperacion)nodo).getOperacion() == tipoOp.entre){ 
-				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
-				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
+			} else if( operador 	== tipoOp.mas 
+					|| operador == tipoOp.menos
+					|| operador == tipoOp.por
+					|| operador == tipoOp.entre){ 
+				// Si el operador es + - * / ambos operandos tipos deben ser enteros
 				if( tipoIzquierdo == "Int" && tipoDerecho == "Int")									
 					return "Int";
 				else{
 					printError("Operandos de diferente tipo");
-					return "Otro";
+					return "TypeError";
 				}
 				
 			} else {
-				String tipoIzquierdo 	= comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
-				String tipoDerecho 		= comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
+				// Si no son ninguno de los anteriores son < <= > >= y tienen que ser ambos operandos Int
 				if( tipoIzquierdo == "Int" && tipoDerecho == "Int")
 					return "Boolean";
 				else {
 					printError("Operandos de diferente tipo");
-					return "Otro";
+					return "TypeError";
 				}
 			}
 		}
 		else if(nodo instanceof NodoCallFuncion){
+			// Si es una funcion verificar que ha sido declarada y retornar tipo buscando en la tabla de simbolos
 			String nombreFuncion =  ((NodoCallFuncion)nodo).getNombre();
-			if(!tablaSimbolos.buscarAmbito(nombreFuncion))
-				return tablaSimbolos.getTipoFuncion( nombreFuncion ) ;	
-			else {
-	    		printError("La funcion "+nombreFuncion+" no puede ser llamada si no ha sido declarada");
-				return "Otro";
-			}
+			if(verificarExistenciaDeFuncion(nombreFuncion))
+				return tablaSimbolos.getTipoFuncion( nombreFuncion );	
+			else 
+				return "TypeError";
+	
 		}		
-		else if(nodo instanceof NodoIdentificador){			
+		else if(nodo instanceof NodoIdentificador){
+			// Si es un identificador verificar que ha sido declarada en el ambito y retornar tipo buscando en la tabla de simbolos		
 		    String identificador = ((NodoIdentificador)nodo).getNombre();
+		    verificarIdentificador(nodo);
 		    if( verificarExistenciaDeVariable(identificador)){
 				String tipoIdentificador = tablaSimbolos.getTipo(ultimoAmbito, identificador);
 				return tipoIdentificador;
 		    }
+		    else
+		    	return "TypeError";
 		}
 		else if(nodo instanceof NodoValor){	
+			// Si es nodo valor retornar tipo de valor e.g. 1,2,3,4 o true o false
 			Integer tipo= ((NodoValor)nodo).getTipo();
 			if(tipo==0)
 				return "Int";			
@@ -193,8 +227,9 @@ public class Semantico {
 				return "Boolean";	
 		}
 		
-		return "";
+		return "TypeError";
 	}
+	
 	private boolean verificarExistenciaDeVariable(String identificador){ 
     	// Compruebo que la variable ha sido declara en el ambito
     	if(!tablaSimbolos.buscarTabla(ultimoAmbito, identificador)){
@@ -205,11 +240,21 @@ public class Semantico {
     	}
 	}
 	
+	private boolean verificarExistenciaDeFuncion(String nombreFuncion){
+		if(tablaSimbolos.buscarAmbito(nombreFuncion)){
+   			printError("La funcion "+nombreFuncion+" no ha sido declarada");
+			return false;		
+		} else 
+			return true;
+	}
+	
 	private void recorrerArgumentos(NodoBase nodo, ArrayList<String> arrayArgumentos ){
 		if (nodo instanceof NodoIdentificador){
+			recorrerArbol(nodo);
+			
 			// Buscar que la variable exista y sea del tipo correcto
 			String identificador = ((NodoIdentificador)nodo).getNombre();
-		    
+		    			
 			if(verificarExistenciaDeVariable(identificador)){
 				String tipoIdentificador = tablaSimbolos.getTipo(ultimoAmbito, identificador);
 				arrayArgumentos.add(tipoIdentificador);
@@ -223,8 +268,7 @@ public class Semantico {
 			String tipoIzquierdo = comprobarTipo(((NodoOperacion)nodo).getOpIzquierdo());
 			String tipoDerecho = comprobarTipo(((NodoOperacion)nodo).getOpDerecho());
 			
-			if( tipoIzquierdo == tipoDerecho){
-				
+			if( tipoIzquierdo == tipoDerecho){				
 				arrayArgumentos.add(tipoDerecho);
 			} else{			
 				printError("Tipos diferentes");
@@ -238,9 +282,9 @@ public class Semantico {
 		}
 		
 		if ( ((NodoBase)nodo).getHermanoDerecha() != null)
-				recorrerArgumentos(((NodoBase)nodo).getHermanoDerecha(),arrayArgumentos);
-		
+				recorrerArgumentos(((NodoBase)nodo).getHermanoDerecha(),arrayArgumentos);		
 	}
+	
 	private boolean recorrerFuncion(NodoBase raiz,String Tipo,String nombre){
 		boolean ban=false;
 		while (raiz != null) {
@@ -252,8 +296,63 @@ public class Semantico {
 			raiz = raiz.getHermanoDerecha();
 		}
 		return ban;
-	}	
+	}
+	
+	private void recorrerAsignacion(NodoBase nodo){
+    	String identificador = ((NodoAsignacion)nodo).getIdentificador();
+    	
+    	if (verificarExistenciaDeVariable(identificador)){	    	
+    		String tipo = tablaSimbolos.getTipo(ultimoAmbito, identificador);
+    		if(comprobarTipo(((NodoAsignacion)nodo).getExpresion()) != tipo){
+    			printError("Asignacion a variable de diferente tipo");
+    		}
+    	}
+    	boolean ifArray = tablaSimbolos.getIfArray(ultimoAmbito, identificador);	
+    	if(ifArray){
+    		if ( ((NodoAsignacion)nodo).getPosicion() == null) {
+    			printError("El identificador " + identificador + " es vector y debe ser llamado usado: x[]");
+    		} else{
+    			recorrerArbol(((NodoAsignacion)nodo).getPosicion());
+    			if (comprobarTipo(((NodoAsignacion)nodo).getPosicion()) != "Int") {
+    				printError("El indice del vector "+identificador+" debe ser tipo Int");
+    			}
+    		}
+    	} else {
+    		if( ((NodoAsignacion)nodo).getPosicion() != null ){
+    			printError("El identificador " + identificador + " no ha sido declarado como vector");
+    		}
+    	}
+	}
+
+	private boolean verificarIdentificador(NodoBase nodo){
+		String nombre = ((NodoIdentificador)nodo).getNombre();	
+		boolean retorno = true;
+		if (verificarExistenciaDeVariable(nombre)){    	
+			boolean esArray = tablaSimbolos.getIfArray(ultimoAmbito, nombre);
+	    	if(esArray){
+	    		if(((NodoIdentificador)nodo).getExpresion() == null )
+	    			printError("El identificador " + nombre + " es vector y debe ser declarado usado: "+nombre+"[]");
+	    		else {
+	    			recorrerArbol(((NodoIdentificador)nodo).getExpresion());
+	    			if (comprobarTipo(((NodoIdentificador)nodo).getExpresion()) != "Int") {
+	    				printError("El indice del vector "+nombre+" debe ser tipo Int");
+	    			}
+	    		}
+	    	} else {
+	    		if( ((NodoIdentificador)nodo).getExpresion() != null ){
+	    			printError("El identificador " + nombre + " no ha sido declarado como vector");
+	    		}
+	    	}
+	    	
+		} else
+			retorno = false;
+		
+		return retorno;
+	}
+	
 	private void printError(Object chain){		
+
+		
 		System.err.println("[Error Semantico]: "+chain);
 		this.anyError = true;
 	}	
