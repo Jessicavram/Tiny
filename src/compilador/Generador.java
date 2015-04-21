@@ -1,5 +1,7 @@
 package compilador;
 
+import java.util.ArrayList;
+
 import ast.*;
 
 public class Generador {
@@ -33,7 +35,7 @@ public class Generador {
 	 * y extraccion de esta pila
 	 */
 	private static int desplazamientoTmp = 0;
-	private static int localidad_return;
+	private static ArrayList<Integer> localidad_return = new ArrayList<Integer>();
 	private static TablaSimbolos tablaSimbolos = null;
 	private static String ultimoAmbito;
 	private static int saltomain;
@@ -329,21 +331,24 @@ public class Generador {
 	}
 	private static void generarFuncion(NodoBase nodo){
 		//aqui debo de poner el Imen a la tabla
+			desplazamientoTmp = -40;
+			ultimoAmbito=((NodoFuncion)nodo).getNombre();
 			int pos=UtGen.emitirSalto(0);
 			tablaSimbolos.setiMem(ultimoAmbito,pos );
 			NodoFuncion n = (NodoFuncion)nodo;
-			/*
-			if(n.getArgs()!=null)
-				generarArgumentos(n.getArgs());
 			if(n.getSent()!=null)
-				generar(n.getSent());
-			//El return debe saltar a esta linea de codigo
-			localidad_return=UtGen.emitirSalto(0); //Nueva Linea 
-			//Bajo de la pila temporal el numero de la linea en la cual quedo
-			UtGen.emitirRM("LD", UtGen.NL, ++desplazamientoTmp, UtGen.MP, "#linea: Recupera el #de linea a saltar, lo guardo en NL");
-			//Salto incondicional a donde quede REVISAR
-			UtGen.emitirRM("LDA", UtGen.PC, UtGen.NL,UtGen.GP, "Salto incodicional a donde fue llamada la funcion");
-			*/
+				generar(n.getSent(),true);			
+			//coloco todos los saltos de los return ya que se donde termina la funcion
+			pos=UtGen.emitirSalto(0);
+			for	(int i=0; i<localidad_return.size();i++){
+				UtGen.cargarRespaldo(localidad_return.get(i));
+				UtGen.emitirRM("LDA", UtGen.PC, pos, UtGen.GP, "salto del return");
+				UtGen.restaurarRespaldo();
+			}
+			localidad_return.clear();
+			//Salto incondicional a donde quede
+			UtGen.emitirRM("LDA", UtGen.PC, 0,UtGen.NL, "Salto incodicional a donde fue llamada la funcion");
+			desplazamientoTmp=0;
 	}
 	
 	//TODO: enviar preludio a archivo de salida, obtener antes su nombre
@@ -377,31 +382,33 @@ public class Generador {
 	}
 	private static void generarReturn(NodoBase nodo){
 		generar(((NodoReturn)nodo).getExpresion(),true);
-		//guardar en AC el valor retornado
-		UtGen.emitirRM("LD", UtGen.AC, ++desplazamientoTmp, UtGen.MP, "ret: Recuperar de la pila Temporal el valor a retornar, y lo guardo en AC");
-		
-		//aqui debo saltar a donde termina la funcion
-		UtGen.emitirRM_Abs("LDA", UtGen.PC, localidad_return, "jmp hacia donde quedo"); //Nueva linea
+		//la setencia anterior deja en AC el valor retornado		
+		//Guargo una posicion para saltar a la linea donde termina la funcion
+		localidad_return.add(UtGen.emitirSalto(1));
+
 	}
 	private static void generarLlamado(NodoBase nodo){
-		//Subir la linea actual
-		UtGen.emitirRM("LDA", UtGen.AC, 1, UtGen.PC, "(AC=Pos actual + 1)");
-		UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el #linea a retornar");
 		//cargar las variables
 		NodoCallFuncion n = (NodoCallFuncion)nodo;		
 		if (n.getArgs()!=null){	
 			NodoBase aux = n.getArgs();
 			do{			
 				generar(aux,false); //deja es AC el valor
+				//cambiar de ambito 
+				//buscar la direccion de memoria
+				//guardar en esa direccion
+				//cambiar de ambito de nuevo al actual 
 				UtGen.emitirRM("ST", UtGen.AC, desplazamientoTmp--, UtGen.MP, "llamado: push en la pila tmp el argumento");	
+				
 				aux=aux.getHermanoDerecha();
 			}while(aux!=null);
-		}
-		//cambiar de ambito
-		ultimoAmbito =((n.getNombre()));
+		}	
+		//Poner en NL la linea actual + 1
+		UtGen.emitirRM("LDA", UtGen.NL, 1, UtGen.PC, "(AC=Pos actual + 1)");
+		
 		//saltar a la linea donde empieza la funcion
-		int pos = tablaSimbolos.getiMem(ultimoAmbito);
-		UtGen.emitirRM("LDA", UtGen.PC, pos,UtGen.GP, "Salto incodicional a donde fue llamada la funcion");
+		int pos = tablaSimbolos.getiMem(((n.getNombre())));
+		UtGen.emitirRM("LDA", UtGen.PC, pos,UtGen.GP, "Salto a la primera linea de la funcion");
 	}
 
 }
