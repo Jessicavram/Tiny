@@ -244,6 +244,10 @@ public class TablaSimbolos {
 		System.err.println("[Error Semantico]: "+chain);
 		error = true;
 	}		
+	
+	public boolean getError(){
+		return error;
+	}
 	/*
 	 * TODO:
 	 * 1. Crear lista con las lineas de codigo donde la variable es usada.

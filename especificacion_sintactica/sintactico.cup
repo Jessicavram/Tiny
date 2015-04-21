@@ -7,6 +7,7 @@ action code {:
 	private boolean modoDepuracion=false;
 	private NodoBase ast=null;
 	public int lineanum=0;
+	public boolean error = false;
 	
 	//Debe ser llamada solo despues de un parse(), en caso contrario retornara null siempre;
 	public NodoBase getASTroot(){
@@ -15,8 +16,14 @@ action code {:
 :}
 
 parser code {:
+ 	public boolean error = false;
 	public void	syntax_error(Symbol cur_token){
 		System.err.println("[Error Sintatico]: Linea "+ cur_token.value );
+		error = true;
+	}
+	
+	public boolean getError(){
+		return error;
 	}
 :}
 
@@ -244,6 +251,7 @@ stmt        ::= if_stmt:sif	{: if(modoDepuracion) System.out.println("\t regla 3
             	:}
             | error				{: if(modoDepuracion) System.out.println("\t regla 3l"); 
 				System.out.println("Ocurrio error en cup # 0004");
+				this.error = true;
 				RESULT=null;
 				:}
             ;
@@ -279,12 +287,13 @@ assign_stmt ::= ID:variable 	{: if(modoDepuracion) System.out.println("\t regla 
 		;
 
 read_stmt   ::=  READ ID:variable	{: if(modoDepuracion) System.out.println("\t regla 7"); 
-					System.out.println("Leyendo Variable");
+					if(modoDepuracion)
+						System.out.println("Leyendo Variable");
 					if(variable!=null)
 					RESULT = new NodoLeer(variable.toString());
 					else{
-					RESULT = null;
-					System.out.println("Ocurrio error en cup # 0002");
+					RESULT = null;if(modoDepuracion)
+						System.out.println("Ocurrio error en cup # 0002");
 					}
 					:}
 				| READ array:vector  {:
@@ -292,7 +301,8 @@ read_stmt   ::=  READ ID:variable	{: if(modoDepuracion) System.out.println("\t r
 				    RESULT= new NodoLeer(vector);
 				    else{
 				    RESULT=null;
-				    System.out.println("Ocurrio error en cup # 0003");
+				    if(modoDepuracion)
+				    	System.out.println("Ocurrio error en cup # 0003");
 				    }
 				 :}
 		;
@@ -371,11 +381,11 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 						RESULT = null;
 						System.out.println("Ocurrio error en cup # 0005");
 					}
-					System.out.println("ddddd"+valor);
 					:}
 		| ID:variable	{: if(modoDepuracion) System.out.println("\t regla 12c"); 
 					if(variable!=null){
-						System.out.println("Construyendo Nodo ID para Lexema: "+ variable.toString());
+						if(modoDepuracion)
+							System.out.println("Construyendo Nodo ID para Lexema: "+ variable.toString());
 						RESULT= new NodoIdentificador(variable.toString());		
 					}else{
 						RESULT = null;
@@ -414,7 +424,8 @@ factor      ::= LPAREN exp:ex RPAREN	{: if(modoDepuracion) System.out.println("\
 		|TRUE {:  RESULT= new NodoValor(1,1); :}
 		|FALSE {: RESULT= new NodoValor(0,1); :}
 		| error	{: if(modoDepuracion) System.out.println("\t regla 12f"); 
-				System.out.println("Ocurrio error en cup # 0003");
+				if(modoDepuracion)
+					System.out.println("Ocurrio error en cup # 0003");
 				RESULT=null;
 				:}
 		;
@@ -431,7 +442,8 @@ boolean_stmt::= BOOLEAN var_list:variables_list 	{: if(modoDepuracion) System.ou
 		;
 
 var_list	::= decl_part:dpart COMMA var_list:variables 		{: if(modoDepuracion) System.out.println("\t regla 15a");
-				System.out.println("Construyendo Nodo ID ");
+				if(modoDepuracion)
+					System.out.println("Construyendo Nodo ID ");
 				
 				RESULT = new NodoIdentificador(dpart, variables);		
 				

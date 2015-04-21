@@ -10,6 +10,9 @@ public class Compilador {
 	, esto debido a que dicha clase no provee mucha informaci�n de contexto que podria ser util para el analisis semantico o ayudar en la construccion del AST
 	Mas informacion en: http//4thmouse.com/index.php/2007/02/15/using-custom-symbols-in-cup/
 	***********/
+	
+	private static boolean errorSintactico = false;
+	private static boolean errorSemantico = false;
 
 	public static void main(String[] args) throws Exception {
 		@SuppressWarnings("deprecation")
@@ -29,6 +32,9 @@ public class Compilador {
 		//Para ver depuracion de analisis sintactico se debe ir al parser.java y colocar modoDepuracion en true
 		parser_obj.parse();
 		NodoBase root=parser_obj.action_obj.getASTroot();
+		
+		// Devolver variable si hubo error en el analisis semantico
+		errorSemantico = parser_obj.getError();
 		System.out.println();
 		System.out.println("IMPRESION DEL AST GENERADO");
 		System.out.println();
@@ -37,17 +43,23 @@ public class Compilador {
 		tablaSimbolos.cargarTabla(root);
 		tablaSimbolos.ImprimirClaves();
 		
+		// Devolver variable si hubo error en la generacion de la tabla de simbolos
+		errorSemantico = tablaSimbolos.getError();
+				
 		Semantico semantico = new Semantico(tablaSimbolos);
 		semantico.recorrerArbol(root);
+		errorSemantico = semantico.getError();
 		
 
-		UtGen.abrir_archivo();
-		Generador.setTablaSimbolos(tablaSimbolos);
-		Generador.generarCodigoObjeto(root);
-		UtGen.cerrar_archivo();
-		
+		if (!errorSemantico && !errorSintactico){
+			UtGen.abrir_archivo();
+			Generador.setTablaSimbolos(tablaSimbolos);
+			Generador.generarCodigoObjeto(root);
+			UtGen.cerrar_archivo();
+		}
+
 		//Para generar solo el codigodel main
-		// tablaSimbolos.setUltimoAmbito("main");
+//		tablaSimbolos.setUltimoAmbito("main");
 		//Generador.generarCodigoObjeto(((NodoProgram)root).getMain());
 
 	}
