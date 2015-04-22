@@ -245,6 +245,7 @@ public class Semantico {
 		else if(nodo instanceof NodoCallFuncion){
 			// Si es una funcion verificar que ha sido declarada y retornar tipo buscando en la tabla de simbolos
 			String nombreFuncion =  ((NodoCallFuncion)nodo).getNombre();
+			verificarCallFuncion(nodo);
 			if(verificarExistenciaDeFuncion(nombreFuncion))
 				return tablaSimbolos.getTipoFuncion( nombreFuncion );	
 			else 
@@ -319,6 +320,7 @@ public class Semantico {
 			}
 			
 		} else if (nodo instanceof NodoCallFuncion){
+			verificarCallFuncion(nodo);
 			String tipoDeFunction = tablaSimbolos.getTipoFuncion(((NodoCallFuncion)nodo).getNombre());			
 			arrayArgumentos.add(tipoDeFunction);
 
