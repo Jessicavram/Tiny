@@ -39,8 +39,9 @@ public class Semantico {
 		    	verificarFor(raiz);
 		    else if (raiz instanceof NodoFuncion)
 		    	verificarFuncion(raiz);		     
-		    else if (raiz instanceof NodoCallFuncion) 	
+		    else if (raiz instanceof NodoCallFuncion){ 
 		    	verificarCallFuncion(raiz);		    
+		    }
 		    else if (raiz instanceof NodoReturn)
 	    		verificarReturn(raiz);
 		    else if (raiz instanceof NodoProgram) {
@@ -149,12 +150,13 @@ public class Semantico {
     	// Si la funcion ha sido declarada
     	if(verificarExistenciaDeFuncion(nombreFuncion)){
     		// Si la funcion tiene argumentos
+    		printError("llego");
 	    	if(argumentos != null){
 	    		recorrerArbol((argumentos));			    		
 		    	recorrerArgumentos((argumentos),arrayArgumentos);
 		    	// Si la funcion recibe argumentos
 		    	if (tablaSimbolos.getArrayArguments( nombreFuncion) != null) {
-			    	if (!tablaSimbolos.getArrayArguments( nombreFuncion).equals(arrayArgumentos) ){ 
+			    	if (tablaSimbolos.getArrayArguments( nombreFuncion).size()== arrayArgumentos.size() && tablaSimbolos.getArrayArguments( nombreFuncion)==(arrayArgumentos) ){ 
 			    		printError("Llamada a funcion "+nombreFuncion+" invalida, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
 			    	}		
 		    	} else {
