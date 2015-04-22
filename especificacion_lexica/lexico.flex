@@ -8,6 +8,7 @@ import java_cup.runtime.*;
 %column
 %public
 %unicode
+
 /* Habilitar la compatibilidad con el interfaz CUP para el generador sintactico*/
 %cup
 /* Llamar Scanner a la clase que contiene el analizador Lexico */

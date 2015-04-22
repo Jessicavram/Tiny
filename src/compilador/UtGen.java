@@ -49,7 +49,7 @@ public class UtGen {
 	}
 	public static void abrir_archivo(){
 		try {
-			fichero=new FileWriter("C:\\Users\\Tyson\\git\\tiny\\archivo.tm");
+			fichero=new FileWriter("archivo.tm");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

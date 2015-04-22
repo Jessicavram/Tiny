@@ -41,6 +41,8 @@ public class Semantico {
 		    	verificarFuncion(raiz);		     
 		    else if (raiz instanceof NodoCallFuncion) 	
 		    	verificarCallFuncion(raiz);		    
+		    else if (raiz instanceof NodoReturn)
+	    		verificarReturn(raiz);
 		    else if (raiz instanceof NodoProgram) {
 		    	if(((NodoProgram)raiz).getFunctions()!=null){
 		    		recorrerArbol(((NodoProgram)raiz).getFunctions());
@@ -138,7 +140,7 @@ public class Semantico {
 	}
 	
 	private void verificarFuncion(NodoBase nodo){
-    	ultimoAmbito = ((NodoFuncion)nodo).getNombre();	// Cambio el ambito cuando entro a una funcion  
+    	ultimoAmbito = ((NodoFuncion)nodo).getNombre();	// Cambio el ambito cuando entro a una funcion 
     	tablaSimbolos.getPrimerArgumento(ultimoAmbito);
     	//Buscar el return
     	if(( (((NodoFuncion)nodo).getTipo())=="Int" || (((NodoFuncion)nodo).getTipo())=="Boolean") 
@@ -147,9 +149,19 @@ public class Semantico {
     	else if(((NodoFuncion)nodo).getTipo()=="Void"){
     		recorrerFuncion(((NodoFuncion)nodo).getSent(),((NodoFuncion)nodo).getTipo(),((NodoFuncion)nodo).getNombre());
     	}
-    	recorrerArbol(((NodoFuncion)nodo).getSent());
-	}	
-	
+    	//incializar argumentos
+    	if(((NodoFuncion)nodo).getArgs()!=null){
+    		//lamar a inicializar los argumentos
+    		inicializarargumentos(((NodoFuncion)nodo).getArgs());
+    	}
+    	recorrerArbol(((NodoFuncion)nodo).getSent());    	
+	}
+	private void inicializarargumentos(NodoBase nodo){
+		NodoDeclaracion n = (NodoDeclaracion)nodo;
+		tablaSimbolos.setInizializacion(ultimoAmbito, ((NodoIdentificador)n.getVariable()).getNombre(), true);
+    	if((nodo.getHermanoDerecha())!= null)
+			inicializarargumentos((nodo.getHermanoDerecha()));
+	}
 	private void verificarCallFuncion(NodoBase nodo){
 		ArrayList<String> arrayArgumentos 	= new ArrayList<String>();
     	String nombreFuncion 				= ((NodoCallFuncion)nodo).getNombre();
@@ -331,26 +343,9 @@ public class Semantico {
 	
 	private boolean recorrerFuncion(NodoBase raiz,String Tipo,String nombre){
 		boolean ban=false;
-		while (raiz != null) {
-			if(raiz instanceof NodoReturn){				
-			    ban=true;
-			   if(Tipo!="Void"){
-				   //Si entro es una funcion con return exp
-				   if((((NodoReturn)raiz).getExpresion())!=null){
-					   //Si entro si es correcto es return exp
-					   if (comprobarTipo(((NodoReturn)raiz).getExpresion())!=Tipo)
-				    		System.err.println("El tipo de dato retornado en la funcion "+nombre+" no corresponde. Debe ser tipo "+Tipo);
-				   }else{
-					   //Error no tiene exp y debe tene expresion
-					   System.err.println("La expresion return no es compatible con el tipo de funcion. Debe retornar un dato de tipo "+Tipo);
-				   }	
-			   }else{
-				   if((((NodoReturn)raiz).getExpresion())!=null)
-					   //error tiene exp y no debe retornar nada
-					   System.err.println("La expresion return no es compatible con el tipo de funcion. Debe retornar vacio");
-			   }
-				   
-			}
+		while (raiz != null && !ban) {
+			if(raiz instanceof NodoReturn)
+			    ban=true; 				   
 			raiz = raiz.getHermanoDerecha();
 		}
 		return ban;
@@ -408,6 +403,27 @@ public class Semantico {
 			retorno = false;
 		
 		return retorno;
+	}
+	private void verificarReturn(NodoBase raiz) {
+		NodoReturn n = (NodoReturn)raiz;
+		String tipo=tablaSimbolos.getTipoFuncion(ultimoAmbito);
+		if (tipo==null)
+			tipo="Void";
+		if(tipo!="Void"){
+			//Si entro es una funcion con return exp
+			if((n.getExpresion())!=null){
+					//Si entro si es correcto es return exp
+					   if (comprobarTipo(n.getExpresion())!=tipo)
+				    		printError("["+ultimoAmbito+"] El tipo de dato retornado no corresponde. Debe ser tipo "+tipo);
+				   }else{
+					   //Error no tiene exp y debe tene expresion
+					   printError("["+ultimoAmbito+"] La expresion return no es compatible con el tipo de funcion. Debe retornar un dato de tipo "+tipo);
+				   }	
+			   }else{
+				   if(n.getExpresion()!=null)
+					   //error tiene exp y no debe retornar nada
+					   printError("["+ultimoAmbito+"] La expresion return no es compatible con el tipo de funcion");
+			   }
 	}
 	
 	private void printError(Object chain){				

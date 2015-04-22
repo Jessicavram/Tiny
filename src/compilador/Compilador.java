@@ -18,11 +18,17 @@ public class Compilador {
 		@SuppressWarnings("deprecation")
 		SymbolFactory sf = new DefaultSymbolFactory();
 		parser parser_obj;
-		if (args.length==0) 
-			parser_obj=new parser(new Scanner(System.in,sf),sf);
-		else 
-			parser_obj=new parser(new Scanner(new java.io.FileInputStream(args[0]),sf),sf);
-		UtGen.debug=false; //NO muestro mensajes de depuracion del generador (UTGen) para que el codigo sea compatible con la version visual de la TM
+		Scanner s;
+		
+		if (args.length==0) {
+			s=new Scanner(System.in,sf);
+			parser_obj=new parser(s,sf);
+		}
+		else{ 
+			s=new Scanner(new java.io.FileInputStream(args[0]),sf);
+			parser_obj=new parser(s,sf);
+		}
+			UtGen.debug=false; //NO muestro mensajes de depuracion del generador (UTGen) para que el codigo sea compatible con la version visual de la TM
 		//Para ver depuracion de analisis sintactico se debe ir al parser.java y colocar modoDepuracion en true
 		parser_obj.parse();
 		NodoBase root=parser_obj.action_obj.getASTroot();
@@ -44,15 +50,13 @@ public class Compilador {
 		semantico.recorrerArbol(root);
 		errorSemantico = semantico.getError();
 		
+
 		if (!errorSemantico && !errorSintactico){
 			UtGen.abrir_archivo();
 			Generador.setTablaSimbolos(tablaSimbolos);
 			Generador.generarCodigoObjeto(root);
 			UtGen.cerrar_archivo();
 		}
-		//Para generar solo el codigodel main
-//		tablaSimbolos.setUltimoAmbito("main");
-		//Generador.generarCodigoObjeto(((NodoProgram)root).getMain());
 
 	}
 
