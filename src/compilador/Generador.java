@@ -396,7 +396,7 @@ public class Generador {
 	}
 	private static void generarLlamado(NodoBase nodo){
 		//cargar las variables
-		NodoCallFuncion n = (NodoCallFuncion)nodo;		
+		NodoCallFuncion n = (NodoCallFuncion)nodo;
 		if (n.getArgs()!=null){	
 			NodoBase aux = n.getArgs();
 			int pos = tablaSimbolos.getPrimerArgumento(((NodoCallFuncion)nodo).getNombre());

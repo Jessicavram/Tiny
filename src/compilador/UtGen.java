@@ -36,7 +36,7 @@ public class UtGen {
 	public static int  AC1=1;
 	
 	/* Defino al registro[4] como el Numero de Linea a retornar */
-	public static int  NL=1;
+	public static int  NL=4;
 	
 	/*Fichero para guardar el codigo generado para Tiny*/
 	public static FileWriter fichero=null;
