@@ -19,7 +19,7 @@ import java_cup.runtime.*;
 		this(r);
 		this.sf=sf;
 		lineanum=1;
-		debug=true;
+		debug=false;
 	}
 	private SymbolFactory sf;
 	public int lineanum;

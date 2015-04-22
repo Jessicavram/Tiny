@@ -7,7 +7,7 @@ public class Semantico {
 	private TablaSimbolos tablaSimbolos;
 	private String ultimoAmbito;	
 	public boolean debug = true;
-	public boolean anyError = false;
+	private boolean anyError = false;
 	
 	public Semantico(TablaSimbolos tablaSimbolos) {
 		super();
@@ -389,11 +389,13 @@ public class Semantico {
 		return retorno;
 	}
 	
-	private void printError(Object chain){		
-
-		
+	private void printError(Object chain){				
 		System.err.println("[Error Semantico]: "+chain);
 		this.anyError = true;
 	}	
+	
+	public boolean getError(){
+		return anyError;
+	}
 }
 
