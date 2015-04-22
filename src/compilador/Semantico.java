@@ -29,7 +29,7 @@ public class Semantico {
 		    	verificarAsignacion(raiz);		    	
 		    else if (raiz instanceof  NodoEscribir)
 		    	verificarEscribir(raiz);
-		    else if (raiz instanceof  NodoEscribir)
+		    else if (raiz instanceof  NodoLeer)
 		    	verificarLeer(raiz);			
 		    else if (raiz instanceof NodoOperacion)		    	
 		    	verificarOperacion(raiz);
@@ -39,8 +39,9 @@ public class Semantico {
 		    	verificarFor(raiz);
 		    else if (raiz instanceof NodoFuncion)
 		    	verificarFuncion(raiz);		     
-		    else if (raiz instanceof NodoCallFuncion) 	
-		    	verificarCallFuncion(raiz);		    
+		    else if (raiz instanceof NodoCallFuncion){ 
+		    	verificarCallFuncion(raiz);		 
+		    }
 		    else if (raiz instanceof NodoReturn)
 	    		verificarReturn(raiz);
 		    else if (raiz instanceof NodoProgram) {
@@ -84,7 +85,28 @@ public class Semantico {
 	}
 	
 	private void verificarLeer(NodoBase nodo){
-		recorrerArbol(((NodoLeer)nodo).getPosicion());
+		String identificador = ((NodoLeer)nodo).getIdentificador();	
+	    
+    	if (verificarExistenciaDeVariable(identificador)){	
+    		tablaSimbolos.setInizializacion(ultimoAmbito, identificador, true);
+    		String tipo = tablaSimbolos.getTipo(ultimoAmbito, identificador);
+        	boolean ifArray = tablaSimbolos.getIfArray(ultimoAmbito, identificador);	
+        	if(ifArray){
+        		if ( ((NodoLeer)nodo).getPosicion() == null) {
+        			printError("El identificador " + identificador + " es vector y debe ser llamado usado: "+identificador+"[]");
+        		} else{
+        			recorrerArbol(((NodoLeer)nodo).getPosicion());
+        			if (comprobarTipo(((NodoLeer)nodo).getPosicion()) != "Int") {
+        				printError("El indice del vector "+identificador+" debe ser tipo Int");
+        			}
+        		}
+        	} else {
+        		if( ((NodoLeer)nodo).getPosicion() != null ){
+        			printError("El identificador " + identificador + " no ha sido declarado como vector");
+        		}
+        	}
+    	}	    
+		
 	}
 	
 	private void verificarDeclaracion(NodoBase nodo){
@@ -119,7 +141,7 @@ public class Semantico {
 	}
 	
 	private void verificarFuncion(NodoBase nodo){
-    	ultimoAmbito = ((NodoFuncion)nodo).getNombre();	// Cambio el ambito cuando entro a una funcion  
+    	ultimoAmbito = ((NodoFuncion)nodo).getNombre();	// Cambio el ambito cuando entro a una funcion 
     	tablaSimbolos.getPrimerArgumento(ultimoAmbito);
     	//Buscar el return
     	if(( (((NodoFuncion)nodo).getTipo())=="Int" || (((NodoFuncion)nodo).getTipo())=="Boolean") 
@@ -128,9 +150,19 @@ public class Semantico {
     	else if(((NodoFuncion)nodo).getTipo()=="Void"){
     		recorrerFuncion(((NodoFuncion)nodo).getSent(),((NodoFuncion)nodo).getTipo(),((NodoFuncion)nodo).getNombre());
     	}
-    	recorrerArbol(((NodoFuncion)nodo).getSent());
-	}	
-	
+    	//incializar argumentos
+    	if(((NodoFuncion)nodo).getArgs()!=null){
+    		//lamar a inicializar los argumentos
+    		inicializarargumentos(((NodoFuncion)nodo).getArgs());
+    	}
+    	recorrerArbol(((NodoFuncion)nodo).getSent());    	
+	}
+	private void inicializarargumentos(NodoBase nodo){
+		NodoDeclaracion n = (NodoDeclaracion)nodo;
+		tablaSimbolos.setInizializacion(ultimoAmbito, ((NodoIdentificador)n.getVariable()).getNombre(), true);
+    	if((nodo.getHermanoDerecha())!= null)
+			inicializarargumentos((nodo.getHermanoDerecha()));
+	}
 	private void verificarCallFuncion(NodoBase nodo){
 		ArrayList<String> arrayArgumentos 	= new ArrayList<String>();
     	String nombreFuncion 				= ((NodoCallFuncion)nodo).getNombre();
@@ -144,7 +176,8 @@ public class Semantico {
 		    	recorrerArgumentos((argumentos),arrayArgumentos);
 		    	// Si la funcion recibe argumentos
 		    	if (tablaSimbolos.getArrayArguments( nombreFuncion) != null) {
-			    	if (!tablaSimbolos.getArrayArguments( nombreFuncion).equals(arrayArgumentos) ){ 
+
+			    	if (!tablaSimbolos.getArrayArguments(nombreFuncion).equals(arrayArgumentos) ){ 
 			    		printError("Llamada a funcion "+nombreFuncion+" invalida, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
 			    	}		
 		    	} else {
@@ -212,6 +245,7 @@ public class Semantico {
 		else if(nodo instanceof NodoCallFuncion){
 			// Si es una funcion verificar que ha sido declarada y retornar tipo buscando en la tabla de simbolos
 			String nombreFuncion =  ((NodoCallFuncion)nodo).getNombre();
+			verificarCallFuncion(nodo);
 			if(verificarExistenciaDeFuncion(nombreFuncion))
 				return tablaSimbolos.getTipoFuncion( nombreFuncion );	
 			else 
@@ -286,6 +320,7 @@ public class Semantico {
 			}
 			
 		} else if (nodo instanceof NodoCallFuncion){
+			verificarCallFuncion(nodo);
 			String tipoDeFunction = tablaSimbolos.getTipoFuncion(((NodoCallFuncion)nodo).getNombre());			
 			arrayArgumentos.add(tipoDeFunction);
 
