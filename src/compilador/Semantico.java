@@ -119,7 +119,7 @@ public class Semantico {
 	}
 	
 	private void verificarFuncion(NodoBase nodo){
-    	ultimoAmbito = ((NodoFuncion)nodo).getNombre();	// Cambio el ambito cuando entro a una funcion  
+    	ultimoAmbito = ((NodoFuncion)nodo).getNombre();	// Cambio el ambito cuando entro a una funcion 
     	tablaSimbolos.getPrimerArgumento(ultimoAmbito);
     	//Buscar el return
     	if(( (((NodoFuncion)nodo).getTipo())=="Int" || (((NodoFuncion)nodo).getTipo())=="Boolean") 
@@ -128,9 +128,19 @@ public class Semantico {
     	else if(((NodoFuncion)nodo).getTipo()=="Void"){
     		recorrerFuncion(((NodoFuncion)nodo).getSent(),((NodoFuncion)nodo).getTipo(),((NodoFuncion)nodo).getNombre());
     	}
-    	recorrerArbol(((NodoFuncion)nodo).getSent());
-	}	
-	
+    	//incializar argumentos
+    	if(((NodoFuncion)nodo).getArgs()!=null){
+    		//lamar a inicializar los argumentos
+    		inicializarargumentos(((NodoFuncion)nodo).getArgs());
+    	}
+    	recorrerArbol(((NodoFuncion)nodo).getSent());    	
+	}
+	private void inicializarargumentos(NodoBase nodo){
+		NodoDeclaracion n = (NodoDeclaracion)nodo;
+		tablaSimbolos.setInizializacion(ultimoAmbito, ((NodoIdentificador)n.getVariable()).getNombre(), true);
+    	if((nodo.getHermanoDerecha())!= null)
+			inicializarargumentos((nodo.getHermanoDerecha()));
+	}
 	private void verificarCallFuncion(NodoBase nodo){
 		ArrayList<String> arrayArgumentos 	= new ArrayList<String>();
     	String nombreFuncion 				= ((NodoCallFuncion)nodo).getNombre();
