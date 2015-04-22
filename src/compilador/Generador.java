@@ -206,7 +206,7 @@ public class Generador {
 		else
 		{
 			generar(n.getPosicion(),true);
-			UtGen.emitirRO("ADD",UtGen.GP,UtGen.GP,UtGen.AC,"sumo despazamiento al registro GP");
+			UtGen.emitirRO("ADD",UtGen.GP,UtGen.GP,UtGen.AC,"sumo desplazamiento al registro GP");
 			UtGen.emitirRO("IN", UtGen.AC, 0, 0, "leer: lee un valor entero ");
 			direccion = tablaSimbolos.getDireccion(ultimoAmbito,n.getIdentificador());
 			UtGen.emitirRM("ST", UtGen.AC, direccion, UtGen.GP, "leer: almaceno el valor entero leido en el id "+n.getIdentificador());
