@@ -175,7 +175,7 @@ public class Semantico {
 		    	recorrerArgumentos((argumentos),arrayArgumentos);
 		    	// Si la funcion recibe argumentos
 		    	if (tablaSimbolos.getArrayArguments( nombreFuncion) != null) {
-			    	if (!tablaSimbolos.getArrayArguments( nombreFuncion).equals(arrayArgumentos) ){ 
+			    	if (!tablaSimbolos.getArrayArguments( nombreFuncion).equals(arrayArgumentos)  ){ 
 			    		printError("Llamada a funcion "+nombreFuncion+" invalida, debe ser "+nombreFuncion+ "(" +tablaSimbolos.getArrayArguments( nombreFuncion) +",)");
 			    	}		
 		    	} else {
