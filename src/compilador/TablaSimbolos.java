@@ -230,13 +230,12 @@ public class TablaSimbolos {
 	}
 	
 	public void setInizializacion(String ambito, String identificador,boolean inicializado ){
-	    tablaAmbito = tabla.get(ambito);
+		tablaAmbito = tabla.get(ambito);
 	    RegistroSimbolo simbolo = tablaAmbito.get(identificador);
 	    tablaAmbito.remove(identificador);
-
-	    simbolo.setInicializado(inicializado);	    
-
-	    tablaAmbito.put(identificador, simbolo);	    
+	    	    	    
+	    simbolo.setInicializado(inicializado);
+	    tablaAmbito.put(identificador, simbolo);
 	    tabla.put(ambito, tablaAmbito);
 	}	
 	

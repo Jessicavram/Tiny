@@ -29,7 +29,7 @@ public class Semantico {
 		    	verificarAsignacion(raiz);		    	
 		    else if (raiz instanceof  NodoEscribir)
 		    	verificarEscribir(raiz);
-		    else if (raiz instanceof  NodoEscribir)
+		    else if (raiz instanceof  NodoLeer)
 		    	verificarLeer(raiz);			
 		    else if (raiz instanceof NodoOperacion)		    	
 		    	verificarOperacion(raiz);
@@ -85,7 +85,28 @@ public class Semantico {
 	}
 	
 	private void verificarLeer(NodoBase nodo){
-		recorrerArbol(((NodoLeer)nodo).getPosicion());
+		String identificador = ((NodoLeer)nodo).getIdentificador();	
+	    
+    	if (verificarExistenciaDeVariable(identificador)){	
+    		tablaSimbolos.setInizializacion(ultimoAmbito, identificador, true);
+    		String tipo = tablaSimbolos.getTipo(ultimoAmbito, identificador);
+        	boolean ifArray = tablaSimbolos.getIfArray(ultimoAmbito, identificador);	
+        	if(ifArray){
+        		if ( ((NodoLeer)nodo).getPosicion() == null) {
+        			printError("El identificador " + identificador + " es vector y debe ser llamado usado: "+identificador+"[]");
+        		} else{
+        			recorrerArbol(((NodoLeer)nodo).getPosicion());
+        			if (comprobarTipo(((NodoLeer)nodo).getPosicion()) != "Int") {
+        				printError("El indice del vector "+identificador+" debe ser tipo Int");
+        			}
+        		}
+        	} else {
+        		if( ((NodoLeer)nodo).getPosicion() != null ){
+        			printError("El identificador " + identificador + " no ha sido declarado como vector");
+        		}
+        	}
+    	}	    
+		
 	}
 	
 	private void verificarDeclaracion(NodoBase nodo){
