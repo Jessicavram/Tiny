@@ -1,20 +1,13 @@
 begin 
 	
-int a,b[10],c,g;
-	
+int a,b[10],c[10];
 boolean d;
 
-d:=true;
-c:=0;
-b[0]:=2;
-a:=1;
-	
-
-
-b[1]:=b[0]*a;
-	
-if d!=false or c=1 and c>=3 then
-b[2]:=4;
+read b[1];
+for x:=2; x<10; x:=x+1 
+	b[x]:=x+1;
+	c[x]=b[x]*2;
+	write c[x];
 end;
-read d;
+
 end
