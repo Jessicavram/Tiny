@@ -1,3 +1,15 @@
+void funcion() begin
+int x;
+x:=1;
+end
+
+int retornarsuma(int a,int b) begin
+int resultado;
+resultado:=0;
+resultado:=a+b;
+return resultado;
+end
+
 begin 
 	
 int a,b[10],c,g;
